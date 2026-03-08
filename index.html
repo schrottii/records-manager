@@ -6,10 +6,26 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link href="style.css" rel="stylesheet" type="text/css">
+
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="images/favicon/favicon.ico">
 </head>
 
 <body>
-    <h2><span id="tabTitle2">Records Manager</span></h2>
+    <div class="topRow">
+        <img style="float: left; height: 64px;" src="images/logo.png" />
+        <div style="float: right;">
+            <button class="themeButton" onclick="changeTheme('light')">☀️</button>
+            <button class="themeButton" onclick="changeTheme('dark')">🌙</button>
+            <button class="themeButton" onclick="changeTheme('auto')">⚡</button>
+        </div>
+        <h2 id="tabTitle2" style="position: absolute; display: inline; margin: auto; text-align: center;">Records Manager</h2>
+    </div>
+    <br style="clear: both;" />
+
     <div style="background-color: rgb(20, 20, 20, 0.5);">
         <h3 id="sectionTitle">---</h3>
         <div style="float: left; width: 29%; overflow-y: scroll; max-height: 67vh;">
@@ -41,7 +57,7 @@
     <br /> <br />
     <div style="float: right; text-align: right;">
         <span id="tabTitle3"></span> using <br />
-        Records Manager v1.0 <br />
+        Records Manager v1.1 <br />
         Made by Schrottii/Balnoom &copy; 2025-2026 <br />
         <a href="https://schrottii.github.io/">link to my other projects</a>
         <br />
@@ -53,6 +69,7 @@
     <script src="code/libs/wikitext-html-converter.js"></script>
     <script src="wikidata.js"></script>
     <script src="code/config.js"></script>
+    <script src="code/recordpoints.js"></script>
 
     <script src="code/save.js"></script>
     <script src="code/main.js"></script>

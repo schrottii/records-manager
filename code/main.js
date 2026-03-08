@@ -26,7 +26,7 @@ var editor = {
 }
 
 var catConfigs = [
-    "name", "header", "sorter", "ascending", "preText", "tree", "exportRowsLimit"
+    "name", "header", "sorter", "ascending", "preText", "tree", "exportRowsLimit", "isRecordPoints"
 ];
 
 ////////////////////////////////////////////////
@@ -35,6 +35,23 @@ var catConfigs = [
 
 function generateID() {
     return "" + Math.random().toString(16).slice(2);
+}
+
+function changeTheme(theme) {
+    if (!config.darkModeSwitch) return false;
+    setSetting("theme", theme);
+    loadTheme(theme);
+}
+
+function loadTheme(theme = undefined) {
+    if (theme === undefined) theme = getSetting("theme");
+    if (theme === false) {
+        theme = config.defaultTheme;
+        setSetting("theme", theme);
+    }
+
+    document.body.style["color-scheme"] = theme;
+    document.body.style["background-image"] = config.darkModeBG && theme == "dark" ? 'url("images/texture-bg-dark.png")' : 'url("images/texture-bg.png")';
 }
 
 function convertToWikitext() {
@@ -98,6 +115,8 @@ function sortableValue(v) {
     // takes care of various values to sort by, ie time, high numbers
     // this is purely internal and should not be returned to render
     if (v == undefined) return v;
+    if (typeof (v) != "string") v = "" + v;
+
     v = v.replaceAll(",", "");
     //v = v.replaceAll(".", "");
 
@@ -149,7 +168,7 @@ function sortableValue(v) {
 }
 
 function toggleUpsideDown() {
-    saveData.settings.upsideDown = ui.toggleUpsideDown.checked;
+    setSetting("upsideDown", ui.toggleUpsideDown.checked);
     sortTable();
 }
 
@@ -270,6 +289,9 @@ function createTable(name, content) {
     for (let h in trimmedHeaders) {
         trimmedHeaders[h] = trimmedHeaders[h].trim().toLowerCase();
     }
+
+    if (saveData.catConfig[name].isRecordPoints === "true") saveData.records[name] = sortTable(generateRecordPointsTable(getRecordPoints()), "manual");
+    if (saveData.catConfig[name].isRecordPoints === "total") saveData.records[name] = sortTable(generateRecordPointsTable(getRecordPoints(true)), "manual");
 
     let cclass = "";
     let cclick = "";
@@ -440,12 +462,16 @@ function editCategoryConfig(cfg) {
 function addTableRow() {
     let headers = saveData.catConfig[saveData.selected].header;
     let example = [];
-    for (let e of saveData.records[saveData.selected][0]) {
-        example.push(e);
+    if (saveData.records[saveData.selected].length > 0) {
+        for (let e of saveData.records[saveData.selected][0]) {
+            example.push(e);
+        }
+        if (example[example.length - 1].includes("[http")) {
+            example[example.length - 1] = "images";
+        }
     }
-    if (example[example.length - 1].includes("[http")) {
-        example[example.length - 1] = "images";
-    }
+    else example = "";
+
     if (headers.includes("lace")) {
         headers = headers.split("lace")[1];
     }
@@ -472,12 +498,26 @@ function addTableRowEmpty() {
 }
 
 function sortTable(tableID = saveData.selected, sortByID = "auto") {
-    let oldTable = saveData.records[tableID];
+    let oldTable;
+    let isManual = false;
+
+    if (sortByID == "manual") {
+        // directly inserts a table
+        isManual = true;
+        oldTable = tableID;
+    }
+    else {
+        oldTable = saveData.records[tableID];
+    }
+
     let newTable = [];
     let pairs = []; // each pair is: [ID, value]
     // it sorts by value, and uses the ID to place them around
 
-    if (sortByID == "auto" && saveData.catConfig[saveData.selected].sorter != undefined) {
+    if (isManual) {
+        sortByID = 1;
+    }
+    else if (sortByID == "auto" && saveData.catConfig[saveData.selected].sorter != undefined) {
         let headers = saveData.catConfig[saveData.selected].header.split("!!");
         for (head in headers) {
             headers[head] = headers[head].trim().toLowerCase();
@@ -492,21 +532,25 @@ function sortTable(tableID = saveData.selected, sortByID = "auto") {
 
     // create pairs [ID, value]
     for (let p in oldTable) {
-        pairs.push([p, sortableValue(oldTable[p][sortByID])]);
+        pairs.push([parseInt(p), sortableValue(oldTable[p][sortByID])]);
     }
 
     // sort
-    let ascending = saveData.catConfig[saveData.selected].ascending;
+    let ascending = saveData.catConfig[saveData.selected] != undefined ? saveData.catConfig[saveData.selected].ascending : false;
     if (ascending == undefined || ascending == "undefined" || ascending == "false") ascending = false;
     if (ascending == "true") ascending = true;
-    if (saveData.settings.upsideDown == true) ascending = !ascending;
+    if (getSetting("upsideDown") == true) ascending = !ascending;
 
     for (let j = 0; j < pairs.length - 1; j++) {
         for (let i = j + 1; i < pairs.length; i++) {
+            //console.log(pairs[i][1], pairs[j][1]);
             if (ascending == true ? pairs[i][1] < pairs[j][1] : pairs[j][1] < pairs[i][1]) {
                 // swap
                 if (ascending == true) {
                     // turn j to i, then i to j
+                    if (editor.row - 1 == i) editor.row = j + 1;
+                    else if (editor.row - 1 == j) editor.row = i + 1;
+
                     let temp = [pairs[j][0], pairs[j][1]];
                     pairs[j] = [pairs[i][0], pairs[i][1]];
                     pairs[i] = temp;
@@ -514,6 +558,9 @@ function sortTable(tableID = saveData.selected, sortByID = "auto") {
                 else {
                     // descending (default)
                     // turn i to j, then j to i
+                    if (editor.row - 1 == i) editor.row = j + 1;
+                    else if (editor.row - 1 == j) editor.row = i + 1;
+
                     let temp = [pairs[i][0], pairs[i][1]];
                     pairs[i] = [pairs[j][0], pairs[j][1]];
                     pairs[j] = temp;
@@ -521,14 +568,23 @@ function sortTable(tableID = saveData.selected, sortByID = "auto") {
             }
         }
     }
+    //console.log(pairs);
 
     // generate new Table from the swapped pairs
     for (let n in oldTable) {
+        if (isManual && newTable.length == 10) break;
         newTable.push(oldTable[pairs[n][0]]);
     }
 
-    saveData.records[tableID] = newTable;
+    if (isManual) return newTable;
+    else saveData.records[tableID] = newTable;
     renderRightSide();
+}
+
+function createNewCategory(name) {
+    let newID = generateID();
+    saveData.records[newID] = [];
+    saveData.catConfig[newID] = { name: name, header: "! Place !! x !! y" };
 }
 
 ////////////////////////////////////////////////
@@ -559,7 +615,7 @@ function renderCategoriesList() {
             || nameFilters.includes(filter)
         ) {
             treeName = saveData.catConfig[ID].tree ? ("<small style='font-size: 12px; position: absolute; left: 10px; text-align: left;'>" + saveData.catConfig[ID].tree.split(".")[0] + "> </small>") : "";
-            render = render + "<button class='listButton' onclick='showCategory(`" + ID + "`)' style='position: relative; " + (saveData.selected == ID ? "background-color: rgb(255, 255, 180);" : "") + "'>" + treeName + saveData.catConfig[ID].name + "</button><br />";
+            render = render + "<button class='listButton' onclick='showCategory(`" + ID + "`)' style='position: relative; " + (saveData.selected == ID ? "background-color: light-dark(rgb(255, 255, 180), rgb(0, 0, 75));" : "") + "'>" + treeName + saveData.catConfig[ID].name + "</button><br />";
         }
     }
 
@@ -598,6 +654,7 @@ function initializeManager() {
         newSaveData();
     }
 
+    loadTheme();
     renderEverything();
 }
 

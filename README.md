@@ -16,6 +16,8 @@ You may not make money with it (besides donations), remove the credits/donation 
 - GitHub
 
 ## Contents 
+To see what's new, read patch_notes.md
+
 Accessible for users:
 - Displaying list of categories with easy and fast selection
 - Rendering the table
@@ -38,6 +40,6 @@ Config content:
 - Data from wikidata.js is loaded automatically on boot, can be used to show it to public
 
 ## To do
-- Score counter for players (simple and points)
+- proper support for adding and moving categories
 - Own records, saved locally
 - alarm if a player gets added a second time to table (catconfig for that?)

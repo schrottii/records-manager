@@ -1,10 +1,32 @@
+/* define colors to re-use! 
+    or just change at the places where they appear */
+:root {
+    /* main black/white or bright/dark colors */
+    --mainbright: white;
+    --maindark: black;
+
+    /* for text */
+    --textbright: white;
+    --textdark: black;
+
+    /* less intense than main */
+    --elegantbright: antiquewhite;
+    --elegantdark: darkslategray;
+
+    /* with transparency, for now only used at the top */
+    --transbright: rgb(47, 49, 49, 0.5);
+    --transdark: rgb(250, 235, 215, 0.5);
+}
+
 /* general element css */
 body {
     text-align: center;
     background-image: url("images/texture-bg.png");
     background-size: 100vw 100vh;
-    color: white;
+    color: var(--textbright);
     font-size: 24px;
+
+    color-scheme: light;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -14,8 +36,8 @@ h1, h2, h3, h4, h5, h6 {
 
 button {
     border-style: ridge;
-    background-color: antiquewhite;
-    color: black;
+    background-color: light-dark(var(--elegantbright), var(--elegantdark));
+    color: light-dark(var(--textdark), var(--textbright));
     border-width: 4px;
     min-height: 40px;
 }
@@ -24,12 +46,27 @@ input {
     font-size: 18px;
 }
 
+/* general css */
+.topRow {
+    background-color: light-dark(var(--transbright), var(--transdark));
+    margin-top: 0px;
+    width: 100%;
+    min-height: 40px;
+}
+
+.themeButton {
+    min-width: 48px;
+    margin-left: 8px;
+    margin-right: 8px;
+    background-color: light-dark(var(--elegantdark), var(--maindark));
+}
+
 /* left side css */
 .listButton {
     width: 100%;
-    border: 4px solid black;
-    background-color: rgb(240, 240, 240);
-    color: black;
+    border: 4px solid var(--maindark);
+    color: light-dark(var(--textdark), var(--elegantbright));
+    background-color: light-dark(rgb(227, 222, 222), rgb(28, 33, 33));
     font-size: 20px;
 }
 
@@ -39,7 +76,7 @@ input {
 
 /* general table css */
 .tableClass {
-    background-color: black;
+    background-color: var(--maindark);
     color: rgb(7, 7, 7);
     margin: 0px auto;
     width: 80%;
@@ -47,7 +84,7 @@ input {
 
 .headerClass {
     background-color: rgb(67, 109, 109);
-    color: white;
+    color: var(--textbright);
 }
 
 .headerClass:hover {
@@ -55,23 +92,24 @@ input {
 }
 
 .rowClass {
-    background-color: rgb(227, 222, 222);
+    color: light-dark(var(--textdark), var(--elegantbright));
+    background-color: light-dark(rgb(227, 222, 222), rgb(28, 33, 33));
 }
 
-.rowClass:hover {
-    background-color: white;
-    filter: brightness(120%);
-}
+    .rowClass:hover {
+        background-color: light-dark(var(--mainbright), var(--maindark));
+        filter: brightness(120%);
+    }
 
 /* highlighters for table rows */
 .golden {
-    background-color: gold;
+    background-color: light-dark(gold, darkgoldenrod);
 }
 
 .highlighted {
-    background-color: white;
+    background-color: light-dark(var(--elegantbright), var(--elegantdark));
 }
 
 .editing {
-    background-color: orange;
+    background-color: light-dark(orange, darkred);
 }

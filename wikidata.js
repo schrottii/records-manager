@@ -1,3 +1,5 @@
 ﻿var exampleData = `
 
 `;
+
+var hostedData = ``;
