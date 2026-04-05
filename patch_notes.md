@@ -77,4 +77,6 @@
 
 -> Mobile UI:
 - Improved table size
+- Tables can now be scrolled horizontally
 - Disabled empty space / scrolling to the right
+- Fixed empty spaces in some categories

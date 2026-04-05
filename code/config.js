@@ -1,6 +1,6 @@
 var config = {
     // allows editing the data/tables
-    editorMode: false,
+    editorMode: true,
     // how it's stored in localStorage
     localStorageKey: "RECMANG",
     // header at top of page and the tab and bottom
