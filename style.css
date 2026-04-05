@@ -46,6 +46,13 @@ input {
     font-size: 18px;
 }
 
+@media only screen and (max-width: 768px) {
+    body, html {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+}
+
 /* general css */
 .topRow {
     background-color: light-dark(var(--transbright), var(--transdark));

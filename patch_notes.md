@@ -67,3 +67,14 @@
 - Added Copy ID button
 - Added Move table button, which moves it after the ID of another, or (by typing 0) to the very top
 - Prettier editing categories
+
+## v1.2.1 (2026-04-06)
+-> PWA:
+- Added PWA support, meaning RM (and derivates) can basically be "installed" on PC and mobile
+- It works when offline, and auto updates when online
+- It doesn't have the browser-own extra bars and buttons at the top/bottom
+- for derivates: the relevant names & more are in serviceworker.js and manifest.webmanifest
+
+-> Mobile UI:
+- Improved table size
+- Disabled empty space / scrolling to the right
