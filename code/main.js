@@ -722,7 +722,8 @@ function renderRightSide() {
 
     ui.sectionTitle.innerHTML = saveData.catConfig[userData.selected].name;
     ui.rightSide.innerHTML = (saveData.catConfig[userData.selected].preText ? saveData.catConfig[userData.selected].preText : "")
-        + createTable(userData.selected, cat);
+        + "<div class='tableContainer'>"
+        + createTable(userData.selected, cat) + "</div>";
 }
 
 function renderEverything() {

@@ -130,6 +130,20 @@ input {
     width: 80%;
 }
 
+.tableContainer {
+    overflow-y: unset;
+}
+
+@media only screen and (max-width: 768px) {
+    .tableClass {
+        width: 98%;
+    }
+    
+    .tableContainer {
+        overflow-y: scroll;
+    }
+}
+
 .headerClass {
     background-color: rgb(67, 109, 109);
     color: var(--textbright);
