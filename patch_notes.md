@@ -34,3 +34,36 @@
 - Important fix: When a table is sorted after updating the sorter value, the editor row is now moved too!
 - New catConfig: isRecordPoints - set to true for a record points based table, set to manual for total records
 - Added experimental createNewCategory(name), proper support for adding and moving categories is planned for later
+
+## v1.2 (2026-04-05)
+-> Mobile UI:
+- Added support for portrait (mobile) UI
+- Search/list and the selected category are below each other instead of next to each other
+- Title (at the very top) is moved to not overlap
+
+-> Ban lists:
+- Added ban lists feature, shown at the bottom
+- One row of buttons to switch between the different lists
+- Each list shows the banned players
+
+-> Design:
+- Search bar no longer gets scrolled with the rest of the list
+- Tree names (game names in the list) are now only shown for the first, not for multiple categories with the same tree in a row
+- Tree names take up extra space to avoid overlapping and for easier overview
+- Title of the selected category now belongs to the right side
+
+-> Saving:
+- userData (selected, settings) is now separate from saveData(records, catConfig)
+- Some save/load changes
+
+-> Settings:
+- Merged Settings and tools into one
+- New setting: Show gaps (shows how much higher every player is to the score below)
+- (Editor mode only) Added button to convert to Wikitext
+
+-> Editing:
+- Ban lists: Create new ban list, Add Player, Remove Player, Load from Wiki
+- Moving categories is now possible!
+- Added Copy ID button
+- Added Move table button, which moves it after the ID of another, or (by typing 0) to the very top
+- Prettier editing categories

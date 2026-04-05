@@ -1,6 +1,13 @@
 // saving the record categories and the order of categories are separate, to allow for re-ordering
 var saveData;
 
+var userData = {
+    selected: "",
+    settings: {
+
+    }
+}
+
 function loadSaveData() {
     if (localStorage.getItem(config.localStorageKey)) {
         saveData = JSON.parse(localStorage.getItem(config.localStorageKey).substring(config.localStorageKey.length));
@@ -9,9 +16,21 @@ function loadSaveData() {
     return false;
 }
 
+function loadUserData() {
+    if (localStorage.getItem(config.localStorageKey + "_USER")) {
+        userData = JSON.parse(localStorage.getItem(config.localStorageKey + "_USER").substring(config.localStorageKey.length));
+
+        ui.toggleUpsideDown.checked = getSetting("upsideDown");
+        ui.toggleGaps.checked = getSetting("gaps");
+        return true;
+    }
+    return false;
+}
+
 function saveSaveData() {
     console.log("saved");
     localStorage.setItem(config.localStorageKey, config.localStorageKey + JSON.stringify(saveData));
+    localStorage.setItem(config.localStorageKey + "_USER", config.localStorageKey + JSON.stringify(userData));
 }
 
 function newSaveData() {
@@ -23,15 +42,13 @@ function newSaveData() {
         catConfig: {
 
         },
-        selected: "",
-        settings: {
-            
-        }
+        banLists: []
     };
     //console.log(saveData);
 
     // get hosted data, ie settings, persists thru updates
-    loadSaveData();
+    loadUserData();
+
     //console.log(saveData);
 
     // force hostedData onto user if it exists
@@ -73,14 +90,14 @@ function importSaveData() {
 }
 
 function getSetting(name) {
-    if (saveData.settings != undefined && saveData.settings[name] != undefined) {
-        return saveData.settings[name];
+    if (userData.settings != undefined && userData.settings[name] != undefined) {
+        return userData.settings[name];
     }
 }
 
 function setSetting(name, value) {
-    if (saveData.settings == undefined) saveData.settings = {};
-    saveData.settings[name] = value;
+    if (userData.settings == undefined) userData.settings = {};
+    userData.settings[name] = value;
 }
 
 setInterval(() => saveSaveData(), 5000);

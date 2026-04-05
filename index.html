@@ -22,18 +22,27 @@
             <button class="themeButton" onclick="changeTheme('dark')">🌙</button>
             <button class="themeButton" onclick="changeTheme('auto')">⚡</button>
         </div>
-        <h2 id="tabTitle2" style="position: absolute; display: inline; margin: auto; text-align: center;">Records Manager</h2>
+        <h2 id="tabTitle2" class="tabTitle">Records Manager</h2>
     </div>
     <br style="clear: both;" />
 
     <div style="background-color: rgb(20, 20, 20, 0.5);">
-        <h3 id="sectionTitle">---</h3>
-        <div style="float: left; width: 29%; overflow-y: scroll; max-height: 67vh;">
-            search: <input id="categoriesSearch" type="search" onkeyup="renderCategoriesList();">
-            <span id="leftSide"></span>
+        <!-- left side -->
+        <div class="leftSide">
+            search: <br />
+            <input id="categoriesSearch" type="search" onkeyup="renderCategoriesList();" style="width: 98%;">
+            
+            <div class="leftSideList">
+                <span id="leftSide"></span>
+            </div>
         </div>
+
+        <!-- middle bar -->
         <div style="float: left; width: 1%; background-color: rgb(31, 31, 31); color: rgb(31, 31, 31); min-height: 67vh;">I</div>
-        <div style="float: right; width: 70%;">
+        
+        <!-- right side -->
+        <div class="rightSide">
+            <h3 id="sectionTitle">---</h3>
             <span id="editorAreaCategory"></span>
             <br />
             <span id="rightSide"></span>
@@ -42,22 +51,31 @@
         <hr style="clear:both" />
     </div>
 
-    <h3>Tools</h3>
+    <h3>Settings and tools</h3>
     highlight row: <input id="tableSearch" type="search" onblur="renderRightSide();">
     <br /> <input id="top10" type="checkbox" onchange="renderRightSide();">Only show top 10?
+    <br /> <input id="toggleUpsideDown" type="checkbox" onchange="toggleUpsideDown();">Upside Down?
+    <br /> <input id="toggleGaps" type="checkbox" onchange="toggleGaps();">Show gaps?
 
-    <br />
-    <h3>Settings</h3>
     <div id="editorOnlySettings">
-        <button onclick="exportSaveData()">Export data</button> <br />
-        <button onclick="importSaveData()">Import data</button> <br />
+        <h3>(Editor mode only)</h3>
+        <button onclick="exportSaveData()">Export data</button>
+        <button onclick="importSaveData()">Import data</button>
+        <br />
+        <button onclick="convertToWikitext()">Convert to Wikitext</button>
     </div>
-    <input id="toggleUpsideDown" type="checkbox" onchange="toggleUpsideDown();">Upside Down?
+
+    <div id="banListsArea">
+        <h3>Ban lists</h3>
+        <span id="banListsButtons"></span><br />
+        <span id="banListContent"></span>
+    </div>
 
     <br /> <br />
+    <hr />
     <div style="float: right; text-align: right;">
         <span id="tabTitle3"></span> using <br />
-        Records Manager v1.1 <br />
+        Records Manager v1.2 <br />
         Made by Schrottii/Balnoom &copy; 2025-2026 <br />
         <a href="https://schrottii.github.io/">link to my other projects</a>
         <br />
@@ -70,6 +88,7 @@
     <script src="wikidata.js"></script>
     <script src="code/config.js"></script>
     <script src="code/recordpoints.js"></script>
+    <script src="code/banlists.js"></script>
 
     <script src="code/save.js"></script>
     <script src="code/main.js"></script>

@@ -61,6 +61,52 @@ input {
     background-color: light-dark(var(--elegantdark), var(--maindark));
 }
 
+.tabTitle {
+    position: absolute;
+    display: inline;
+    margin: auto;
+    text-align: center;
+}
+
+@media only screen and (max-width: 768px) {
+    .tabTitle {
+        position: unset;
+        display: block;
+    }
+}
+
+.leftSide {
+    float: left;
+    width: 29%;
+}
+
+.rightSide {
+    float: right;
+    width: 70%;
+}
+
+.leftSideList {
+    max-height: 67vh;
+    overflow-y: scroll;
+}
+
+@media only screen and (max-width: 768px) {
+    .leftSide {
+        float: unset;
+        width: 100%;
+    }
+
+    .rightSide {
+        float: unset;
+        width: 100%;
+        font-size: 16px;
+    }
+
+    .leftSideList {
+        max-height: 33vh;
+    }
+}
+
 /* left side css */
 .listButton {
     width: 100%;
@@ -73,6 +119,8 @@ input {
 .listButton:hover {
     filter: brightness(50%);
 }
+
+
 
 /* general table css */
 .tableClass {

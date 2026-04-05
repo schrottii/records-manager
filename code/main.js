@@ -18,6 +18,11 @@ var ui = {
 
     editorOnlySettings: document.getElementById("editorOnlySettings"),
     toggleUpsideDown: document.getElementById("toggleUpsideDown"),
+    toggleGaps: document.getElementById("toggleGaps"),
+
+    banListsArea: document.getElementById("banListsArea"),
+    banListsButtons: document.getElementById("banListsButtons"),
+    banListContent: document.getElementById("banListContent"),
 };
 
 var editor = {
@@ -172,6 +177,11 @@ function toggleUpsideDown() {
     sortTable();
 }
 
+function toggleGaps() {
+    setSetting("gaps", ui.toggleGaps.checked);
+    renderRightSide();
+}
+
 ////////////////////////////////////////////////
 // loading and converting
 ////////////////////////////////////////////////
@@ -279,8 +289,17 @@ function loadCategoriesFromWiki(categoriesContent) {
     }
 }
 
-function createTable(name, content) {
+function createTable(name, og_content) {
+    // record points format tables
+    if (saveData.catConfig[name].isRecordPoints === "true") saveData.records[name] = og_content = sortTable(generateRecordPointsTable(getRecordPoints()), "manual");
+    if (saveData.catConfig[name].isRecordPoints === "total") saveData.records[name] = og_content = sortTable(generateRecordPointsTable(getRecordPoints(true)), "manual");
+
     // turns data into a table, for rendering
+    let content = [];
+    for (let c of og_content) {
+        content.push(Object.assign([], c));
+    }
+
     let counter = 1;
     let table = "{|\n" + saveData.catConfig[name].header;
 
@@ -290,9 +309,20 @@ function createTable(name, content) {
         trimmedHeaders[h] = trimmedHeaders[h].trim().toLowerCase();
     }
 
-    if (saveData.catConfig[name].isRecordPoints === "true") saveData.records[name] = sortTable(generateRecordPointsTable(getRecordPoints()), "manual");
-    if (saveData.catConfig[name].isRecordPoints === "total") saveData.records[name] = sortTable(generateRecordPointsTable(getRecordPoints(true)), "manual");
+    // gaps
+    let sortID = trimmedHeaders.indexOf(saveData.catConfig[name].sorter) - 1;
+    if (sortID != -1 && getSetting("gaps") == true) {
+        let val;
+        for (let c in content) {
+            c = parseInt(c);
+            if (c == content.length - 1 || content[c] == undefined || content[c][sortID] == undefined) continue;
 
+            val = ((sortableValue(content[c][sortID]) / sortableValue(content[c + 1][sortID]) - 1) * 100).toFixed(2);
+            content[c][sortID] += "<span style='float: right;'>(" + (val >= 0 ? "+" : "") + val + "%)</span>";
+        }
+    }
+
+    // render - convert code to wiki (and then to html)
     let cclass = "";
     let cclick = "";
 
@@ -310,7 +340,7 @@ function createTable(name, content) {
         if (config.editorMode) cclick = "onclick='clickRow(" + counter + ")' ";
 
         // ties
-        if (sorter != undefined && prevValue == c[trimmedHeaders.indexOf(sorter) - 1]) {
+        if (sorter != undefined && prevValue == c[sortID].split("<s")[0]) {
             if (prevCount == -1) prevCount = counter - 1;
         }
         else {
@@ -325,7 +355,7 @@ function createTable(name, content) {
             table = table + "||" + cc;
         }
 
-        prevValue = c[trimmedHeaders.indexOf(sorter) - 1]; // also for ties
+        if (sorter != undefined) prevValue = c[sortID].split("<s")[0]; // also for ties
 
         // used for 1./2./3. and top 10 limiter
         counter++;
@@ -340,7 +370,7 @@ function createTable(name, content) {
 function showCategory(name) {
     // triggered when left side button clicked
     // changes right side to selected record category
-    saveData.selected = name;
+    userData.selected = name;
 
     editor.row = -1;
     ui.editorAreaRow.innerHTML = "";
@@ -364,14 +394,14 @@ function clickRow(row) {
     // render cells for editing
     let render = "<h4>Edit row/submission:</h4>";
 
-    for (let c in saveData.records[saveData.selected][row - 1]) {
-        render = render + saveData.catConfig[saveData.selected].header.split("!!")[parseInt(c) + 1] // +1 to ignore place
+    for (let c in saveData.records[userData.selected][row - 1]) {
+        render = render + saveData.catConfig[userData.selected].header.split("!!")[parseInt(c) + 1] // +1 to ignore place
             + "<input id='cell-" + c + "' onblur='editCell(" + c + ")' type='text' style='width: 75%; text-align: left;' value='"
-            + saveData.records[saveData.selected][row - 1][c] + "'></input><br />";
+            + saveData.records[userData.selected][row - 1][c] + "'></input><br />";
     }
 
     render = render + "<button onclick='deleteRow()'>Delete row</button>";
-    render = render + "<button onclick='deletePlayer(`" + saveData.records[saveData.selected][row - 1][saveData.catConfig[saveData.selected].header.split("!!").indexOf(" Player ") - 1] + "`)'>Delete all instances of player</button>";
+    render = render + "<button onclick='deletePlayer(`" + saveData.records[userData.selected][row - 1][saveData.catConfig[userData.selected].header.split("!!").indexOf(" Player ") - 1] + "`)'>Delete all instances of player</button>";
 
     ui.editorAreaRow.innerHTML = render;
 
@@ -379,7 +409,7 @@ function clickRow(row) {
     renderRightSide();
 }
 
-function deleteRow(selTable = saveData.selected, selRow = editor.row) {
+function deleteRow(selTable = userData.selected, selRow = editor.row) {
     // deletes selected row
     if (!config.editorMode) return false;
 
@@ -400,7 +430,7 @@ function deleteRow(selTable = saveData.selected, selRow = editor.row) {
 function editCell(nr) {
     if (!config.editorMode) return false;
 
-    saveData.records[saveData.selected][editor.row - 1][nr] = document.getElementById("cell-" + nr).value;
+    saveData.records[userData.selected][editor.row - 1][nr] = document.getElementById("cell-" + nr).value;
 
     sortTable();
     renderRightSide();
@@ -426,31 +456,36 @@ function deletePlayer(player) {
 // category editing functions
 ////////////////////////////////////////////////
 
-function editCategory(category = saveData.selected) {
+function editCategory(category = userData.selected) {
     if (!config.editorMode) return false;
     editor.category = category;
 
-    let render = "<h4>Edit category:</h4>";
+    let render = "<h4>Edit category:</h4><table style='width: 98%;'>";
 
     // render editable config for the category
     for (let cfg of catConfigs) {
-        render = render + cfg + ": "
-            + "<input id='cfg-" + cfg
-            + "' style='width: 75%; text-align: left;'"
-            + "value='" + saveData.catConfig[category][cfg]
-            + "' onblur='editCategoryConfig(`" + cfg + "`)'></input><br />";
+        render = render + "<tr><td style='width: 30%; text-align: left;'>"
+            + cfg + ":</td><td>"
+            + "<input style='width: 95%;' id='cfg-" + cfg
+            + "' value='" + saveData.catConfig[category][cfg]
+            + "' onblur='editCategoryConfig(`" + cfg + "`)'></input></td></tr>";
     }
+    render += "</table>";
 
     // buttons
     render = render + "<button onclick='sortTable();'>Sort table</button>";
     render = render + "<button onclick='addTableRow();'>Add row</button>";
     render = render + "<button onclick='addTableRowEmpty();'>Add empty row</button>";
+    render = render + "<button onclick='copyTableID();'>Copy ID</button>";
+    render = render + "<button onclick='moveTable();'>Move table</button>";
 
     ui.editorAreaCategory.innerHTML = render;
 }
 
 function editCategoryConfig(cfg) {
-    let newValue = document.getElementById("cfg-" + cfg).value;
+    let newValue = document.getElementById("cfg-" + cfg);
+    if (newValue == "" || newValue == null) return false;
+    newValue = newValue.value;
     if (newValue == "") return false;
 
     saveData.catConfig[editor.category][cfg] = newValue;
@@ -460,10 +495,10 @@ function editCategoryConfig(cfg) {
 }
 
 function addTableRow() {
-    let headers = saveData.catConfig[saveData.selected].header;
+    let headers = saveData.catConfig[userData.selected].header;
     let example = [];
-    if (saveData.records[saveData.selected].length > 0) {
-        for (let e of saveData.records[saveData.selected][0]) {
+    if (saveData.records[userData.selected].length > 0) {
+        for (let e of saveData.records[userData.selected][0]) {
             example.push(e);
         }
         if (example[example.length - 1].includes("[http")) {
@@ -479,25 +514,72 @@ function addTableRow() {
     let input = prompt("separated by ;\n" + headers + "\n" + example);
     if (input == false || input == "" || input == undefined || !input.includes(";")) return false;
     input = input.split(";");
-    if (input.length + 1 != saveData.catConfig[saveData.selected].header.split("!!").length) return false;
+    if (input.length + 1 != saveData.catConfig[userData.selected].header.split("!!").length) return false;
 
-    saveData.records[saveData.selected].push(input);
+    saveData.records[userData.selected].push(input);
     sortTable();
     renderEverything();
 }
 
 function addTableRowEmpty() {
     let emptyRow = [];
-    for (let c = 0; c < saveData.catConfig[saveData.selected].header.split("!!").length - 1; c++) {
+    for (let c = 0; c < saveData.catConfig[userData.selected].header.split("!!").length - 1; c++) {
         emptyRow.push("");
     }
 
-    saveData.records[saveData.selected].push(emptyRow);
+    saveData.records[userData.selected].push(emptyRow);
     sortTable();
     renderEverything();
 }
 
-function sortTable(tableID = saveData.selected, sortByID = "auto") {
+function copyTableID() {
+    let ID = editor.category;
+    navigator.clipboard.writeText(ID);
+}
+
+function moveTable() {
+    // get the ID of the table to move next to (after)
+    let ID = prompt("ID of the table that should be before it? (or, 0 = first)");
+    if (ID === "" || ID === null) return false;
+
+    // where is it?
+    /*
+    let i;
+    for (i of Object.keys(saveData.records)) {
+        if (i == ID) break;
+    }
+        */
+
+    // make a new dict, re-copy everything, but re-order those two
+    let movingID = editor.category;
+    let movingTable = Object.assign([], saveData.records[movingID]);
+
+    let newRecords = {};
+    //console.log(ID, movingID, Object.keys(newRecords).indexOf(ID), Object.keys(newRecords).indexOf(movingID));
+    //console.log(saveData.records, saveData.records.length, newRecords, newRecords.length);
+    for (let table in saveData.records) {
+        //console.log(table, ID, Object.keys(newRecords).length);
+        if (table == ID || (ID === "0" && Object.keys(newRecords).length == 0)) {
+            if (ID !== "0") newRecords[ID] = Object.assign([], saveData.records[table]);
+            newRecords[movingID] = movingTable;
+            console.log(newRecords);
+            //console.log(newRecords[ID], newRecords[movingID]);
+        }
+        if (table == movingID) continue;
+
+        if (table != undefined && table != "undefined") newRecords[table] = Object.assign([], saveData.records[table]);
+    }
+
+    // save
+    saveData.records = {};
+    saveData.records = newRecords;
+
+    // render
+    editor.category = userData.selected = movingID;
+    renderCategoriesList();
+}
+
+function sortTable(tableID = userData.selected, sortByID = "auto") {
     let oldTable;
     let isManual = false;
 
@@ -517,17 +599,17 @@ function sortTable(tableID = saveData.selected, sortByID = "auto") {
     if (isManual) {
         sortByID = 1;
     }
-    else if (sortByID == "auto" && saveData.catConfig[saveData.selected].sorter != undefined) {
-        let headers = saveData.catConfig[saveData.selected].header.split("!!");
+    else if (sortByID == "auto" && saveData.catConfig[userData.selected].sorter != undefined) {
+        let headers = saveData.catConfig[userData.selected].header.split("!!");
         for (head in headers) {
             headers[head] = headers[head].trim().toLowerCase();
         }
-        sortByID = headers.indexOf(saveData.catConfig[saveData.selected].sorter.trim().toLowerCase()) - 1;
+        sortByID = headers.indexOf(saveData.catConfig[userData.selected].sorter.trim().toLowerCase()) - 1;
     }
     if (sortByID == undefined) {
         // usually the right one (0 = player, 1 = value)
         sortByID = 1;
-        saveData.catConfig[saveData.selected].sorter = 1;
+        saveData.catConfig[userData.selected].sorter = 1;
     }
 
     // create pairs [ID, value]
@@ -536,7 +618,7 @@ function sortTable(tableID = saveData.selected, sortByID = "auto") {
     }
 
     // sort
-    let ascending = saveData.catConfig[saveData.selected] != undefined ? saveData.catConfig[saveData.selected].ascending : false;
+    let ascending = saveData.catConfig[userData.selected] != undefined ? saveData.catConfig[userData.selected].ascending : false;
     if (ascending == undefined || ascending == "undefined" || ascending == "false") ascending = false;
     if (ascending == "true") ascending = true;
     if (getSetting("upsideDown") == true) ascending = !ascending;
@@ -595,6 +677,7 @@ function renderCategoriesList() {
     // renders the left side
     let render = "";
     let treeName = "";
+    let treeNamePrev = "";
 
     // ft. search, to either search for the name, or its contents (needs to be fully spelled then)
     let filter = ui.categoriesSearch.value.toLowerCase().trim();
@@ -605,7 +688,7 @@ function renderCategoriesList() {
             nameFilters = [];
             for (n of saveData.records[ID]) {
                 for (nn of n) {
-                    nameFilters.push(nn.toLowerCase().trim());
+                    nameFilters.push(("" + nn).toLowerCase().trim());
                 }
             }
         }
@@ -614,8 +697,19 @@ function renderCategoriesList() {
             || saveData.catConfig[ID].name.toLowerCase().includes(filter)
             || nameFilters.includes(filter)
         ) {
-            treeName = saveData.catConfig[ID].tree ? ("<small style='font-size: 12px; position: absolute; left: 10px; text-align: left;'>" + saveData.catConfig[ID].tree.split(".")[0] + "> </small>") : "";
-            render = render + "<button class='listButton' onclick='showCategory(`" + ID + "`)' style='position: relative; " + (saveData.selected == ID ? "background-color: light-dark(rgb(255, 255, 180), rgb(0, 0, 75));" : "") + "'>" + treeName + saveData.catConfig[ID].name + "</button><br />";
+            if (saveData.catConfig[ID] == undefined) {
+                console.log(ID, saveData.records[ID], saveData.catConfig[ID]);
+                continue;
+            }
+
+            treeName = saveData.catConfig[ID].tree /*&& filter != ""*/ ? ("<small style='font-size: 12px; position: absolute; left: 10px; text-align: left;'>" + saveData.catConfig[ID].tree.split(".")[0] + "> </small><br />") : "";
+            if (treeName == treeNamePrev && treeName != "") {
+                treeNamePrev = treeName;
+                treeName = "";
+            }
+            else treeNamePrev = treeName;
+
+            render = render + "<button class='listButton' onclick='showCategory(`" + ID + "`)' style='position: relative; " + (userData.selected == ID ? "background-color: light-dark(rgb(255, 255, 180), rgb(0, 0, 75));" : "") + "'>" + treeName + saveData.catConfig[ID].name + "</button><br />";
         }
     }
 
@@ -623,12 +717,12 @@ function renderCategoriesList() {
 }
 
 function renderRightSide() {
-    let cat = saveData.records[saveData.selected];
+    let cat = saveData.records[userData.selected];
     if (cat == undefined) return false;
 
-    ui.sectionTitle.innerHTML = saveData.catConfig[saveData.selected].name;
-    ui.rightSide.innerHTML = (saveData.catConfig[saveData.selected].preText ? saveData.catConfig[saveData.selected].preText : "")
-        + createTable(saveData.selected, cat);
+    ui.sectionTitle.innerHTML = saveData.catConfig[userData.selected].name;
+    ui.rightSide.innerHTML = (saveData.catConfig[userData.selected].preText ? saveData.catConfig[userData.selected].preText : "")
+        + createTable(userData.selected, cat);
 }
 
 function renderEverything() {
@@ -638,6 +732,8 @@ function renderEverything() {
 
     renderCategoriesList();
     renderRightSide();
+
+    renderBanLists();
 }
 
 function initializeManager() {
