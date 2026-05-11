@@ -40,6 +40,5 @@ Config content:
 - Data from wikidata.js is loaded automatically on boot, can be used to show it to public
 
 ## To do
-- proper support for adding and moving categories
 - Own records, saved locally
 - alarm if a player gets added a second time to table (catconfig for that?)

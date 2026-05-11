@@ -1,6 +1,8 @@
 ## v1.0 ()
 - Release
 
+
+
 ## v1.1 (2026-03-08)
 -> Record Points:
 - New system: Record Points
@@ -35,6 +37,8 @@
 - New catConfig: isRecordPoints - set to true for a record points based table, set to manual for total records
 - Added experimental createNewCategory(name), proper support for adding and moving categories is planned for later
 
+
+
 ## v1.2 (2026-04-05)
 -> Mobile UI:
 - Added support for portrait (mobile) UI
@@ -68,6 +72,8 @@
 - Added Move table button, which moves it after the ID of another, or (by typing 0) to the very top
 - Prettier editing categories
 
+
+
 ## v1.2.1 (2026-04-06)
 -> PWA:
 - Added PWA support, meaning RM (and derivates) can basically be "installed" on PC and mobile
@@ -80,3 +86,7 @@
 - Tables can now be scrolled horizontally
 - Disabled empty space / scrolling to the right
 - Fixed empty spaces in some categories
+
+
+
+## v1.3 ()
