@@ -14,5 +14,7 @@ var config = {
     // have dark mode as default? options: light, dark, auto
     defaultTheme: "light",
     // does dark mode have its own background?
-    darkModeBG: true
+    darkModeBG: true,
+    // editing: warn if a player who is already in the table is getting added again
+    duplicatePlayerWarning: true
 }

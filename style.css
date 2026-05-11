@@ -40,6 +40,7 @@ button {
     color: light-dark(var(--textdark), var(--textbright));
     border-width: 4px;
     min-height: 40px;
+    margin: 0px 4px 0px 4px;
 }
 
 input {

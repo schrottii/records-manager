@@ -90,3 +90,13 @@
 
 
 ## v1.3 ()
+-> Editing:
+- Unset catconfig is no longer shown as undefined, but empty instead
+- Prettier editing rows
+- Add row: with the new config, duplicate entries can be added, aborted or replace the old one
+
+-> Config:
+- Added duplicatePlayerWarning (editing: warn if a player who is already in the table is getting added again)
+
+-> Other:
+- Increased space between buttons
