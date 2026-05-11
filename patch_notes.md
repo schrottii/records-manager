@@ -90,10 +90,14 @@
 
 
 ## v1.3 ()
+-> Settings:
+- Added random category button
+
 -> Editing:
 - Unset catconfig is no longer shown as undefined, but empty instead
 - Prettier editing rows
 - Add row: with the new config, duplicate entries can be added, aborted or replace the old one
+- Added button to create a new category
 
 -> Config:
 - Added duplicatePlayerWarning (editing: warn if a player who is already in the table is getting added again)

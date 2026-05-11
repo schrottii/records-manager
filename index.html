@@ -63,6 +63,8 @@
     <br /> <input id="top10" type="checkbox" onchange="renderRightSide();">Only show top 10?
     <br /> <input id="toggleUpsideDown" type="checkbox" onchange="toggleUpsideDown();">Upside Down?
     <br /> <input id="toggleGaps" type="checkbox" onchange="toggleGaps();">Show gaps?
+    <br />
+    <button onclick="showRandomCategory()">Random category</button>
 
     <div id="editorOnlySettings">
         <h3>(Editor mode only)</h3>
@@ -70,6 +72,8 @@
         <button onclick="importSaveData()">Import data</button>
         <br />
         <button onclick="convertToWikitext()">Convert to Wikitext</button>
+        <br />
+        <button onclick="createNewCategory()">Create new category</button>
     </div>
 
     <div id="banListsArea">

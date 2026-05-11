@@ -387,6 +387,12 @@ function showCategory(name) {
     saveSaveData();
 }
 
+function showRandomCategory(){
+    let id = Math.floor(Math.random() * Object.keys(saveData.records).length);
+    let name = Object.keys(saveData.records)[id];
+    showCategory(name);
+}
+
 ////////////////////////////////////////////////
 // edit row functions
 ////////////////////////////////////////////////
@@ -690,10 +696,15 @@ function sortTable(tableID = userData.selected, sortByID = "auto") {
     renderRightSide();
 }
 
-function createNewCategory(name) {
+function createNewCategory(name = undefined) {
+    if (name === undefined) {
+        name = prompt("category name?");
+    }
+
     let newID = generateID();
     saveData.records[newID] = [];
     saveData.catConfig[newID] = { name: name, header: "! Place !! x !! y" };
+    renderCategoriesList();
 }
 
 ////////////////////////////////////////////////
