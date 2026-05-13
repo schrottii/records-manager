@@ -34,7 +34,7 @@
 
 -> Editing:
 - Important fix: When a table is sorted after updating the sorter value, the editor row is now moved too!
-- New catConfig: isRecordPoints - set to true for a record points based table, set to manual for total records
+- New catConfig: isRecordPoints - set to true for a record points based table, set to total for total records
 - Added experimental createNewCategory(name), proper support for adding and moving categories is planned for later
 
 
@@ -90,6 +90,9 @@
 
 
 ## v1.3 ()
+-> Player Profiles:
+...
+
 -> Settings:
 - Added random category button
 

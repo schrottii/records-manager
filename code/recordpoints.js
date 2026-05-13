@@ -7,22 +7,19 @@ total records
 sortTable(generateRecordPointsTable(getRecordPoints(true)));
 */
 
-function getRecordPoints(countSingle = false) {
+function getRecordPoints(countSingle = false, singleplayer = false) {
     let players = {};
     let recordCategory;
-    let recordCatconfig;
+    //let recordCatconfig;
     let playersColumns;
     let playersColumn = -1;
 
     for (let r in saveData.records) {
         recordCategory = saveData.records[r];
-        recordCatconfig = saveData.catConfig[r];
+        //recordCatconfig = saveData.catConfig[r];
 
         // a bit unoptimized code, but eh, it tries to find the column that has the player names
-        playersColumns = recordCatconfig.header.split("!!");
-        for (let h in playersColumns) {
-            playersColumns[h] = playersColumns[h].trim().toLowerCase();
-        }
+        playersColumns = getHeaders(r);
         if (playersColumns[0] == "place" || playersColumns[0] == "!place" || playersColumns[0] == "! place") playersColumns.shift();
 
         if (!wordsForPlayers.includes(playersColumns[playersColumn])) playersColumn = -1;
@@ -39,12 +36,29 @@ function getRecordPoints(countSingle = false) {
         let playerName;
         for (let player of recordCategory) {
             if (pos > 10) break; // only count top 10
-            playerName = player[playersColumn].trim();
-            if (playerName == "") continue;
-            //console.log(pos, player);
+            playerName = player[playersColumn];
+            if (playerName === undefined) {
+                console.log("undefined player: " + playerName + " in " + r);
+                console.log(recordCategory);
+                continue;
+            }
 
-            if (players[playerName] == undefined) players[playerName] = countSingle ? 1 : 11 - pos;
-            else players[playerName] += countSingle ? 1 : 11 - pos;
+            playerName = playerName.trim();
+            if (playerName == "") continue;
+
+            //console.log(pos, player);
+            //console.log(singleplayer);
+
+            if (singleplayer !== false) {
+                //console.log(playerName, singleplayer);
+                if (playerName === singleplayer) {
+                    players[r] = countSingle ? 1 : 11 - pos;
+                }
+            }
+            else {
+                if (players[playerName] == undefined) players[playerName] = countSingle ? 1 : 11 - pos;
+                else players[playerName] += countSingle ? 1 : 11 - pos;
+            }
             pos++;
         }
         //console.log(players);
