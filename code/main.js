@@ -19,10 +19,13 @@ var ui = {
     editorOnlySettings: document.getElementById("editorOnlySettings"),
     toggleUpsideDown: document.getElementById("toggleUpsideDown"),
     toggleGaps: document.getElementById("toggleGaps"),
+    toggleShowProfiles: document.getElementById("toggleShowProfiles"),
 
     banListsArea: document.getElementById("banListsArea"),
     banListsButtons: document.getElementById("banListsButtons"),
     banListContent: document.getElementById("banListContent"),
+
+    playerSearch: document.getElementById("playerSearch")
 };
 
 var editor = {
@@ -182,6 +185,10 @@ function toggleGaps() {
     renderRightSide();
 }
 
+function toggleShowProfiles() {
+    setSetting("showProfiles", ui.toggleShowProfiles.checked);
+}
+
 ////////////////////////////////////////////////
 // loading and converting
 ////////////////////////////////////////////////
@@ -289,6 +296,14 @@ function loadCategoriesFromWiki(categoriesContent) {
     }
 }
 
+function getHeaders(name = userData.selected) {
+    let trimmedHeaders = saveData.catConfig[name].header.split("!!");
+    for (let h in trimmedHeaders) {
+        trimmedHeaders[h] = trimmedHeaders[h].trim().toLowerCase();
+    }
+    return trimmedHeaders; // returns array
+}
+
 function createTable(name, og_content) {
     // record points format tables
     if (saveData.catConfig[name].isRecordPoints === "true") saveData.records[name] = og_content = sortTable(generateRecordPointsTable(getRecordPoints()), "manual");
@@ -304,13 +319,10 @@ function createTable(name, og_content) {
     let table = "{|\n" + saveData.catConfig[name].header;
 
     let sorter = saveData.catConfig[name].sorter;
-    let trimmedHeaders = saveData.catConfig[name].header.split("!!");
-    for (let h in trimmedHeaders) {
-        trimmedHeaders[h] = trimmedHeaders[h].trim().toLowerCase();
-    }
+    let headers = getHeaders(name);
 
     // gaps
-    let sortID = trimmedHeaders.indexOf(saveData.catConfig[name].sorter) - 1;
+    let sortID = headers.indexOf(saveData.catConfig[name].sorter) - 1;
     if (sortID != -1 && getSetting("gaps") == true) {
         let val;
         for (let c in content) {
@@ -337,7 +349,8 @@ function createTable(name, og_content) {
         else cclass = "";
 
         // clickable in editor mode
-        if (config.editorMode) cclick = "onclick='clickRow(" + counter + ")' ";
+        //if (config.editorMode)
+        cclick = "onclick='clickRow(" + counter + ")' ";
 
         // ties
         if (sorter != undefined && prevValue == c[sortID].split("<s")[0]) {
@@ -382,26 +395,41 @@ function showCategory(name) {
     saveSaveData();
 }
 
+function showRandomCategory(){
+    let id = Math.floor(Math.random() * Object.keys(saveData.records).length);
+    let name = Object.keys(saveData.records)[id];
+    showCategory(name);
+}
+
 ////////////////////////////////////////////////
 // edit row functions
 ////////////////////////////////////////////////
 
 function clickRow(row) {
-    // select this one
-    if (!config.editorMode) return false;
+    let playerPos = saveData.records[userData.selected][row - 1][saveData.catConfig[userData.selected].header.split("!!").indexOf(" Player ") - 1];
+    
+    if (!config.editorMode) {
+        // no edit mode... wanna see the player?
+        if (getSetting("showProfiles")) renderRightSideProfile(playerPos);
+        return;
+    }
+
+    // select this one to edit
     editor.row = row;
 
     // render cells for editing
-    let render = "<h4>Edit row/submission:</h4>";
+    let render = "<h4>Edit row:</h4><table style='width: 98%;'>";
 
     for (let c in saveData.records[userData.selected][row - 1]) {
-        render = render + saveData.catConfig[userData.selected].header.split("!!")[parseInt(c) + 1] // +1 to ignore place
-            + "<input id='cell-" + c + "' onblur='editCell(" + c + ")' type='text' style='width: 75%; text-align: left;' value='"
-            + saveData.records[userData.selected][row - 1][c] + "'></input><br />";
+        render += "<tr><td>" + saveData.catConfig[userData.selected].header.split("!!")[parseInt(c) + 1] // +1 to ignore place
+            + "</td><td><input id='cell-" + c + "' onblur='editCell(" + c + ")' type='text' style='width: 90%; text-align: left;' value='"
+            + saveData.records[userData.selected][row - 1][c] + "'></input></td></tr>";
     }
+    render += "</table>";
 
-    render = render + "<button onclick='deleteRow()'>Delete row</button>";
-    render = render + "<button onclick='deletePlayer(`" + saveData.records[userData.selected][row - 1][saveData.catConfig[userData.selected].header.split("!!").indexOf(" Player ") - 1] + "`)'>Delete all instances of player</button>";
+    // more buttons
+    render += "<button onclick='deleteRow()'>Delete row</button>";
+    render += "<button onclick='deletePlayer(`" + playerPos + "`)'>Delete all instances of player</button>";
 
     ui.editorAreaRow.innerHTML = render;
 
@@ -467,7 +495,7 @@ function editCategory(category = userData.selected) {
         render = render + "<tr><td style='width: 30%; text-align: left;'>"
             + cfg + ":</td><td>"
             + "<input style='width: 95%;' id='cfg-" + cfg
-            + "' value='" + saveData.catConfig[category][cfg]
+            + "' value='" + (saveData.catConfig[category][cfg] !== undefined ? saveData.catConfig[category][cfg] : "")
             + "' onblur='editCategoryConfig(`" + cfg + "`)'></input></td></tr>";
     }
     render += "</table>";
@@ -496,25 +524,53 @@ function editCategoryConfig(cfg) {
 
 function addTableRow() {
     let headers = saveData.catConfig[userData.selected].header;
-    let example = [];
+    let example = "";
     if (saveData.records[userData.selected].length > 0) {
+        let exampleArray = [];
         for (let e of saveData.records[userData.selected][0]) {
-            example.push(e);
+            exampleArray.push(e);
         }
-        if (example[example.length - 1].includes("[http")) {
-            example[example.length - 1] = "images";
+        for (let e of exampleArray) {
+            //console.log(e);
+            if (e.includes("[https://you") || e.includes("[https://www.you") || e.includes(".mp4")) e = "video(s)";
+            else if (e.includes("[http")) e = "image(s)";
+
+            if (example !== "") example += "; " + e;
+            else example += e;
         }
     }
-    else example = "";
 
     if (headers.includes("lace")) {
         headers = headers.split("lace")[1];
     }
 
     let input = prompt("separated by ;\n" + headers + "\n" + example);
+
     if (input == false || input == "" || input == undefined || !input.includes(";")) return false;
     input = input.split(";");
     if (input.length + 1 != saveData.catConfig[userData.selected].header.split("!!").length) return false;
+
+    // duplicatePlayerWarning config
+    // if this player already exists, ask if that's correct
+    if (config.duplicatePlayerWarning) {
+        let pID = getHeaders().indexOf("player") - 1; // -1 as we remove place
+
+        for (let pl of saveData.records[userData.selected]) {
+            //console.log(input[pID], pl[pID]);
+            if (input[pID] == pl[pID]) {
+                let answer = confirm("This player already exists (" + input[pID] + ", " + pl[pID] + ")\nDo you wish to create another anyway?");
+                if (answer === false) {
+                    answer = confirm("Replace? (If not, abort)");
+                    if (answer === false) return; // abort
+                    else {
+                        // replace old entry (remove old first)
+                        saveData.records[userData.selected].splice(pl, 1);
+                    }
+                }
+                break;
+            }
+        }
+    }
 
     saveData.records[userData.selected].push(input);
     sortTable();
@@ -600,10 +656,7 @@ function sortTable(tableID = userData.selected, sortByID = "auto") {
         sortByID = 1;
     }
     else if (sortByID == "auto" && saveData.catConfig[userData.selected].sorter != undefined) {
-        let headers = saveData.catConfig[userData.selected].header.split("!!");
-        for (head in headers) {
-            headers[head] = headers[head].trim().toLowerCase();
-        }
+        let headers = getHeaders();
         sortByID = headers.indexOf(saveData.catConfig[userData.selected].sorter.trim().toLowerCase()) - 1;
     }
     if (sortByID == undefined) {
@@ -663,10 +716,15 @@ function sortTable(tableID = userData.selected, sortByID = "auto") {
     renderRightSide();
 }
 
-function createNewCategory(name) {
+function createNewCategory(name = undefined) {
+    if (name === undefined) {
+        name = prompt("category name?");
+    }
+
     let newID = generateID();
     saveData.records[newID] = [];
     saveData.catConfig[newID] = { name: name, header: "! Place !! x !! y" };
+    renderCategoriesList();
 }
 
 ////////////////////////////////////////////////

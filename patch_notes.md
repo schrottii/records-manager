@@ -1,6 +1,8 @@
 ## v1.0 ()
 - Release
 
+
+
 ## v1.1 (2026-03-08)
 -> Record Points:
 - New system: Record Points
@@ -32,8 +34,10 @@
 
 -> Editing:
 - Important fix: When a table is sorted after updating the sorter value, the editor row is now moved too!
-- New catConfig: isRecordPoints - set to true for a record points based table, set to manual for total records
+- New catConfig: isRecordPoints - set to true for a record points based table, set to total for total records
 - Added experimental createNewCategory(name), proper support for adding and moving categories is planned for later
+
+
 
 ## v1.2 (2026-04-05)
 -> Mobile UI:
@@ -68,6 +72,8 @@
 - Added Move table button, which moves it after the ID of another, or (by typing 0) to the very top
 - Prettier editing categories
 
+
+
 ## v1.2.1 (2026-04-06)
 -> PWA:
 - Added PWA support, meaning RM (and derivates) can basically be "installed" on PC and mobile
@@ -80,3 +86,39 @@
 - Tables can now be scrolled horizontally
 - Disabled empty space / scrolling to the right
 - Fixed empty spaces in some categories
+
+
+
+## v1.3 (2026-05-16)
+-> Player Profiles:
+- New feature: see info about a player!
+- Can be accessed by clicking a row (if the new setting is enabled), or with the new profile search tool
+- There is a back button to go back to the record category
+- It shows the following:
+- Ban status
+- Record Points, average
+- Amount of top 10, top 3 and #1 
+- Place and points in every category they are in
+- Every category they are first place in
+
+-> Settings:
+- New setting: Click player to see profile (enabled by default, you may want to turn it off to highlight text)
+- Added ability to search for a player to see their profile
+- Added random category button
+
+-> Editing:
+- Unset catconfig is no longer shown as undefined, but empty instead
+- Prettier editing rows
+- Add row: with the new config, duplicate entries can be added, aborted or replace the old one
+- Add row: prettier example (using ; instead of ,)
+- Add row: example now recognizes image(s) and video(s) better (such as youtube links)
+- Added button to create a new category
+
+-> Config:
+- Added duplicatePlayerWarning (editing: warn if a player who is already in the table is getting added again)
+
+-> Other:
+- Added license (based on Balnoom license, with modifications), TOS (not very relevant here), and privacy policy
+- They can be found in the bottom right (where the other info is)
+- Increased space between buttons
+- Other minor design changes

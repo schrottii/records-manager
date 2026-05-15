@@ -40,10 +40,22 @@ button {
     color: light-dark(var(--textdark), var(--textbright));
     border-width: 4px;
     min-height: 40px;
+    margin: 0px 4px 0px 4px;
 }
 
 input {
     font-size: 18px;
+}
+
+ul {
+    width: 400px;
+    margin: auto;
+    text-align: left;
+}
+
+hr {
+    max-width: 80%;
+    opacity: 50%;
 }
 
 @media only screen and (max-width: 768px) {
@@ -95,6 +107,7 @@ input {
 .leftSideList {
     max-height: 67vh;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 @media only screen and (max-width: 768px) {

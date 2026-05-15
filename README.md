@@ -10,6 +10,8 @@ If you want to organize records for a game (or something else) yourself, you can
 Be aware with other things, they could mess with later pulls. 
 You may not make money with it (besides donations), remove the credits/donation button to me, or pretend that the record management system is yours. 
 
+SEE: LICENSE.md
+
 ## Contact
 - Discord: schrottii
 - Discord Server: https://discord.gg/CbBeJXKUrk
@@ -39,7 +41,8 @@ Config content:
 - Easy changing of the table design in style.css
 - Data from wikidata.js is loaded automatically on boot, can be used to show it to public
 
-## To do
-- proper support for adding and moving categories
+## To do / ideas
 - Own records, saved locally
-- alarm if a player gets added a second time to table (catconfig for that?)
+- Player profiles: bios and discord/ingame name (or ID)
+- Better categories tree UI
+- Category images

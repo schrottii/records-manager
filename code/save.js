@@ -22,6 +22,7 @@ function loadUserData() {
 
         ui.toggleUpsideDown.checked = getSetting("upsideDown");
         ui.toggleGaps.checked = getSetting("gaps");
+        ui.toggleShowProfiles.checked = getSetting("showProfiles", true);
         return true;
     }
     return false;
@@ -58,6 +59,7 @@ function newSaveData() {
         let loadedSave = JSON.parse(hostedData.substring(config.localStorageKey.length));
         saveData.records = Object.assign(saveData.records, loadedSave.records);
         saveData.catConfig = Object.assign(saveData.catConfig, loadedSave.catConfig);
+        saveData.banLists = Object.assign(saveData.banLists, loadedSave.banLists);
         //console.log(saveData);
         return true;
     }
@@ -89,9 +91,13 @@ function importSaveData() {
     }
 }
 
-function getSetting(name) {
+function getSetting(name, createSetting = undefined) {
     if (userData.settings != undefined && userData.settings[name] != undefined) {
         return userData.settings[name];
+    }
+    else if (createSetting !== undefined) {
+        userData.settings[name] = createSetting;
+        return createSetting;
     }
 }
 

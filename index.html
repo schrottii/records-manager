@@ -38,7 +38,7 @@
         <div class="leftSide">
             search: <br />
             <input id="categoriesSearch" type="search" onkeyup="renderCategoriesList();" style="width: 98%;">
-            
+
             <div class="leftSideList">
                 <span id="leftSide"></span>
             </div>
@@ -46,7 +46,7 @@
 
         <!-- middle bar -->
         <div style="float: left; width: 1%; background-color: rgb(31, 31, 31); color: rgb(31, 31, 31); min-height: 67vh;">I</div>
-        
+
         <!-- right side -->
         <div class="rightSide">
             <h3 id="sectionTitle">---</h3>
@@ -63,6 +63,11 @@
     <br /> <input id="top10" type="checkbox" onchange="renderRightSide();">Only show top 10?
     <br /> <input id="toggleUpsideDown" type="checkbox" onchange="toggleUpsideDown();">Upside Down?
     <br /> <input id="toggleGaps" type="checkbox" onchange="toggleGaps();">Show gaps?
+    <br /> <input id="toggleShowProfiles" type="checkbox" onchange="toggleShowProfiles();">Click player to see profile?
+    <br />
+    see player profile: <input id="playerSearch" type="search" onblur="openPlayer();">
+    <br />
+    <button onclick="showRandomCategory()">Random category</button>
 
     <div id="editorOnlySettings">
         <h3>(Editor mode only)</h3>
@@ -70,6 +75,8 @@
         <button onclick="importSaveData()">Import data</button>
         <br />
         <button onclick="convertToWikitext()">Convert to Wikitext</button>
+        <br />
+        <button onclick="createNewCategory()">Create new category</button>
     </div>
 
     <div id="banListsArea">
@@ -82,11 +89,15 @@
     <hr />
     <div style="float: right; text-align: right;">
         <span id="tabTitle3"></span> using <br />
-        Records Manager v1.2.1 <br />
+        Records Manager v1.3 <br />
         Made by Schrottii/Balnoom &copy; 2025-2026 <br />
-        <a href="https://schrottii.github.io/">link to my other projects</a>
+        <a href="LICENSE.md" target="_blank"><b>LICENSE</b></a> -
+        <a href="TOS.md" target="_blank">TOS</a> -
+        <a href="PRIVACY.md" target="_blank">PRIVACY POLICY</a>
+        <br />
         <br />
 
+        <a href="https://schrottii.github.io/" target="_blank">link to my other projects</a><br />
         <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
         <script type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#f57373', 'Y8Y2XMZX1'); kofiwidget2.draw();</script>
 
@@ -98,6 +109,7 @@
     <script src="code/config.js"></script>
     <script src="code/recordpoints.js"></script>
     <script src="code/banlists.js"></script>
+    <script src="code/profiles.js"></script>
 
     <script src="code/save.js"></script>
     <script src="code/main.js"></script>
