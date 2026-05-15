@@ -22,6 +22,7 @@ function loadUserData() {
 
         ui.toggleUpsideDown.checked = getSetting("upsideDown");
         ui.toggleGaps.checked = getSetting("gaps");
+        ui.toggleShowProfiles.checked = getSetting("showProfiles", true);
         return true;
     }
     return false;
@@ -89,9 +90,13 @@ function importSaveData() {
     }
 }
 
-function getSetting(name) {
+function getSetting(name, createSetting = undefined) {
     if (userData.settings != undefined && userData.settings[name] != undefined) {
         return userData.settings[name];
+    }
+    else if (createSetting !== undefined) {
+        userData.settings[name] = createSetting;
+        return createSetting;
     }
 }
 

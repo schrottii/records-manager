@@ -38,7 +38,7 @@
         <div class="leftSide">
             search: <br />
             <input id="categoriesSearch" type="search" onkeyup="renderCategoriesList();" style="width: 98%;">
-            
+
             <div class="leftSideList">
                 <span id="leftSide"></span>
             </div>
@@ -46,7 +46,7 @@
 
         <!-- middle bar -->
         <div style="float: left; width: 1%; background-color: rgb(31, 31, 31); color: rgb(31, 31, 31); min-height: 67vh;">I</div>
-        
+
         <!-- right side -->
         <div class="rightSide">
             <h3 id="sectionTitle">---</h3>
@@ -63,10 +63,11 @@
     <br /> <input id="top10" type="checkbox" onchange="renderRightSide();">Only show top 10?
     <br /> <input id="toggleUpsideDown" type="checkbox" onchange="toggleUpsideDown();">Upside Down?
     <br /> <input id="toggleGaps" type="checkbox" onchange="toggleGaps();">Show gaps?
-    <br />
-    <button onclick="showRandomCategory()">Random category</button>
+    <br /> <input id="toggleShowProfiles" type="checkbox" onchange="toggleShowProfiles();">Click player to see profile?
     <br />
     see player profile: <input id="playerSearch" type="search" onblur="openPlayer();">
+    <br />
+    <button onclick="showRandomCategory()">Random category</button>
 
     <div id="editorOnlySettings">
         <h3>(Editor mode only)</h3>

@@ -107,6 +107,7 @@ hr {
 .leftSideList {
     max-height: 67vh;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 @media only screen and (max-width: 768px) {

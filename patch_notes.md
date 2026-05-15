@@ -91,15 +91,27 @@
 
 ## v1.3 ()
 -> Player Profiles:
-...
+- New feature: see info about a player!
+- Can be accessed by clicking a row (if the new setting is enabled), or with the new profile search tool
+- There is a back button to go back to the record category
+- It shows the following:
+- Ban status
+- Record Points, average
+- Amount of top 10, top 3 and #1 
+- Place and points in every category they are in
+- Every category they are first place in
 
 -> Settings:
+- New setting: Click player to see profile (enabled by default, you may want to turn it off to highlight text)
+- Added ability to search for a player to see their profile
 - Added random category button
 
 -> Editing:
 - Unset catconfig is no longer shown as undefined, but empty instead
 - Prettier editing rows
 - Add row: with the new config, duplicate entries can be added, aborted or replace the old one
+- Add row: prettier example (using ; instead of ,)
+- Add row: example now recognizes image(s) and video(s) better (such as youtube links)
 - Added button to create a new category
 
 -> Config:
@@ -107,3 +119,4 @@
 
 -> Other:
 - Increased space between buttons
+- Other minor design changes

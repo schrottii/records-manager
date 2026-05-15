@@ -1,6 +1,9 @@
 function renderRightSideProfile(player) {
     ui.sectionTitle.innerHTML = player;
-    ui.rightSide.innerHTML = renderPlayerBanStatus(player) + renderPlayerPoints(player);
+    ui.editorAreaCategory.innerHTML = "";
+    ui.rightSide.innerHTML = "<button style='float: left;' onclick='renderRightSide();'>Back</button><br style='clear: both;' />"
+        + renderPlayerBanStatus(player)
+        + renderPlayerPoints(player);
 }
 
 function renderPlayerPoints(player) {
@@ -49,7 +52,7 @@ function renderPlayerPoints(player) {
     // list of all categories they are in
     let colorflick = "white";
 
-    ren += "All categories:<table>";
+    ren += "All categories:<table style='text-align: left;'>";
     ren += "<tr style='color: gold;'><td>Category</td><td>Placement</td><td>Record Points</td></tr>";
     for (let cat in points) {
         ren += "<tr style='color: " + (points[cat] == 10 ? "gold" : points[cat] >= 8 ? "silver" : colorflick) + ";'><td><li>" + saveData.catConfig[cat].name + ": </li></td>"

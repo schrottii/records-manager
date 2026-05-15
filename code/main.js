@@ -19,6 +19,7 @@ var ui = {
     editorOnlySettings: document.getElementById("editorOnlySettings"),
     toggleUpsideDown: document.getElementById("toggleUpsideDown"),
     toggleGaps: document.getElementById("toggleGaps"),
+    toggleShowProfiles: document.getElementById("toggleShowProfiles"),
 
     banListsArea: document.getElementById("banListsArea"),
     banListsButtons: document.getElementById("banListsButtons"),
@@ -184,6 +185,10 @@ function toggleGaps() {
     renderRightSide();
 }
 
+function toggleShowProfiles() {
+    setSetting("showProfiles", ui.toggleShowProfiles.checked);
+}
+
 ////////////////////////////////////////////////
 // loading and converting
 ////////////////////////////////////////////////
@@ -344,7 +349,8 @@ function createTable(name, og_content) {
         else cclass = "";
 
         // clickable in editor mode
-        if (config.editorMode) cclick = "onclick='clickRow(" + counter + ")' ";
+        //if (config.editorMode)
+        cclick = "onclick='clickRow(" + counter + ")' ";
 
         // ties
         if (sorter != undefined && prevValue == c[sortID].split("<s")[0]) {
@@ -400,8 +406,15 @@ function showRandomCategory(){
 ////////////////////////////////////////////////
 
 function clickRow(row) {
-    // select this one
-    if (!config.editorMode) return false;
+    let playerPos = saveData.records[userData.selected][row - 1][saveData.catConfig[userData.selected].header.split("!!").indexOf(" Player ") - 1];
+    
+    if (!config.editorMode) {
+        // no edit mode... wanna see the player?
+        if (getSetting("showProfiles")) renderRightSideProfile(playerPos);
+        return;
+    }
+
+    // select this one to edit
     editor.row = row;
 
     // render cells for editing
@@ -416,7 +429,7 @@ function clickRow(row) {
 
     // more buttons
     render += "<button onclick='deleteRow()'>Delete row</button>";
-    render += "<button onclick='deletePlayer(`" + saveData.records[userData.selected][row - 1][saveData.catConfig[userData.selected].header.split("!!").indexOf(" Player ") - 1] + "`)'>Delete all instances of player</button>";
+    render += "<button onclick='deletePlayer(`" + playerPos + "`)'>Delete all instances of player</button>";
 
     ui.editorAreaRow.innerHTML = render;
 
@@ -511,16 +524,21 @@ function editCategoryConfig(cfg) {
 
 function addTableRow() {
     let headers = saveData.catConfig[userData.selected].header;
-    let example = [];
+    let example = "";
     if (saveData.records[userData.selected].length > 0) {
+        let exampleArray = [];
         for (let e of saveData.records[userData.selected][0]) {
-            example.push(e);
+            exampleArray.push(e);
         }
-        if (example[example.length - 1].includes("[http")) {
-            example[example.length - 1] = "images";
+        for (let e of exampleArray) {
+            //console.log(e);
+            if (e.includes("[https://you") || e.includes("[https://www.you") || e.includes(".mp4")) e = "video(s)";
+            else if (e.includes("[http")) e = "image(s)";
+
+            if (example !== "") example += "; " + e;
+            else example += e;
         }
     }
-    else example = "";
 
     if (headers.includes("lace")) {
         headers = headers.split("lace")[1];
