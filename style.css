@@ -47,6 +47,17 @@ input {
     font-size: 18px;
 }
 
+ul {
+    width: 400px;
+    margin: auto;
+    text-align: left;
+}
+
+hr {
+    max-width: 80%;
+    opacity: 50%;
+}
+
 @media only screen and (max-width: 768px) {
     body, html {
         max-width: 100%;

@@ -1,8 +1,6 @@
-var selectedPlayer = "";
-
-function renderRightSideProfile() {
-    ui.sectionTitle.innerHTML = selectedPlayer;
-    ui.rightSide.innerHTML = renderPlayerBanStatus(selectedPlayer) + "<br />" + renderPlayerPoints(selectedPlayer);
+function renderRightSideProfile(player) {
+    ui.sectionTitle.innerHTML = player;
+    ui.rightSide.innerHTML = renderPlayerBanStatus(player) + renderPlayerPoints(player);
 }
 
 function renderPlayerPoints(player) {
@@ -36,24 +34,38 @@ function renderPlayerPoints(player) {
     }
 
     // adding the cool data to the renderer
-    ren += "Record Points: " + total + "<br />";
-    ren += "on average: " + (total / amountOfRecords).toFixed(1) + " (all records) / " + (total / top10).toFixed(1) + " (top 10 records)" + "<br />";
+    ren += "<span style='color: orange;'>Record Points: " + total + "</span><br />";
+    if (total === 0) {
+        ren += "<span style='color: red;'>No records / no data</span>";
+        return ren;
+    }
+
+    ren += "on average: " + (total / amountOfRecords).toFixed(1) + " (all records) / " + (total / top10).toFixed(1) + " (own records)" + "<br />";
     ren += "Top 10 in: " + top10 + " / " + amountOfRecords + "<br />";
-    ren += "Top 3 in: " + top3 + " / " + amountOfRecords + "<br />";
-    ren += "#1 in: " + no1 + " / " + amountOfRecords + "<br />";
+    ren += "<span style='color: silver;'>Top 3 in: " + top3 + " / " + amountOfRecords + "</span><br />";
+    ren += "<span style='color: gold;'>#1 in: " + no1 + " / " + amountOfRecords + "</span><br />";
     ren += "<hr />";
 
     // list of all categories they are in
-    ren += "<br />All categories:<table>";
+    let colorflick = "white";
+
+    ren += "All categories:<table>";
+    ren += "<tr style='color: gold;'><td>Category</td><td>Placement</td><td>Record Points</td></tr>";
     for (let cat in points) {
-        ren += "<tr><td>" + saveData.catConfig[cat].name + ": </td><td>" + points[cat] + " point" + (points[cat] != 1 ? "s" : "") + "</td><td>(" + (11 - points[cat]) + ". place)</td></tr>";
+        ren += "<tr style='color: " + (points[cat] == 10 ? "gold" : points[cat] >= 8 ? "silver" : colorflick) + ";'><td><li>" + saveData.catConfig[cat].name + ": </li></td>"
+        + "<td>" + (11 - points[cat]) + ". place</td>"
+        + "<td> (" + points[cat] + " point" + (points[cat] != 1 ? "s" : "") + ")</td>"
+        + "</tr>";
+        colorflick = colorflick == "white" ? "rgb(255, 255, 235)" : "white";
     }
     ren += "</table>";
+    ren += "<hr />";
 
     // list of categories they are the NUMBER ONE in
-    ren += "<br />#1 categories:<ul>";
+    ren += "#1 categories:<ul>";
     for (let cat in points) {
-        if (points[cat] == 10) ren += "<li>" + saveData.catConfig[cat].name + "</li>";
+        if (points[cat] == 10) ren += "<li style='color: " + colorflick + ";'>" + saveData.catConfig[cat].name + "</li>";
+        colorflick = colorflick == "white" ? "rgb(255, 255, 235)" : "white";
     }
     ren += "</ul>";
 
@@ -81,4 +93,11 @@ function renderPlayerBanStatus(player) {
 
     ren += "<hr />";
     return ren;
+}
+
+function openPlayer() {
+    let player = ui.playerSearch.value;
+    if (player == "" || player == undefined || player == false) return;
+
+    renderRightSideProfile(player);
 }

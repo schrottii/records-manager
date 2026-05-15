@@ -21,7 +21,7 @@ function renderBanLists() {
 function renderBanListContent() {
     let ren = "";
     if (saveData.banLists[selectedBanList] != undefined) {
-        ren += "<ul style='width: 400px; margin: auto; text-align: left;'>";
+        ren += "<ul>";
         for (let cheater of saveData.banLists[selectedBanList][1]) {
             ren += "<li>" + cheater + "</li>";
         }

@@ -23,6 +23,8 @@ var ui = {
     banListsArea: document.getElementById("banListsArea"),
     banListsButtons: document.getElementById("banListsButtons"),
     banListContent: document.getElementById("banListContent"),
+
+    playerSearch: document.getElementById("playerSearch")
 };
 
 var editor = {
