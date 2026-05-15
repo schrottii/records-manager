@@ -118,5 +118,7 @@
 - Added duplicatePlayerWarning (editing: warn if a player who is already in the table is getting added again)
 
 -> Other:
+- Added license (based on Balnoom license, with modifications), TOS (not very relevant here), and privacy policy
+- They can be found in the bottom right (where the other info is)
 - Increased space between buttons
 - Other minor design changes
