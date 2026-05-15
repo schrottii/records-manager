@@ -89,7 +89,7 @@
 
 
 
-## v1.3 ()
+## v1.3 (2026-05-16)
 -> Player Profiles:
 - New feature: see info about a player!
 - Can be accessed by clicking a row (if the new setting is enabled), or with the new profile search tool

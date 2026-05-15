@@ -1,9 +1,12 @@
 function renderRightSideProfile(player) {
     ui.sectionTitle.innerHTML = player;
     ui.editorAreaCategory.innerHTML = "";
+
     ui.rightSide.innerHTML = "<button style='float: left;' onclick='renderRightSide();'>Back</button><br style='clear: both;' />"
         + renderPlayerBanStatus(player)
         + renderPlayerPoints(player);
+
+    ui.editorAreaRow.innerHTML = "";
 }
 
 function renderPlayerPoints(player) {
@@ -24,7 +27,7 @@ function renderPlayerPoints(player) {
 
     // reduce amount of record categories to NOT account for record point categories
     for (let cat in saveData.catConfig) {
-        if (saveData.catConfig[cat].isRecordPoints === true || saveData.catConfig[cat].isRecordPoints === "total") {
+        if (saveData.catConfig[cat].isRecordPoints === "true" || saveData.catConfig[cat].isRecordPoints === "total") {
             amountOfRecords -= 1;
         }
     }
@@ -59,7 +62,7 @@ function renderPlayerPoints(player) {
         + "<td>" + (11 - points[cat]) + ". place</td>"
         + "<td> (" + points[cat] + " point" + (points[cat] != 1 ? "s" : "") + ")</td>"
         + "</tr>";
-        colorflick = colorflick == "white" ? "rgb(255, 255, 235)" : "white";
+        colorflick = colorflick == "white" ? "rgb(222, 222, 255)" : "white";
     }
     ren += "</table>";
     ren += "<hr />";
@@ -68,7 +71,7 @@ function renderPlayerPoints(player) {
     ren += "#1 categories:<ul>";
     for (let cat in points) {
         if (points[cat] == 10) ren += "<li style='color: " + colorflick + ";'>" + saveData.catConfig[cat].name + "</li>";
-        colorflick = colorflick == "white" ? "rgb(255, 255, 235)" : "white";
+        colorflick = colorflick == "white" ? "rgb(222, 222, 255)" : "white";
     }
     ren += "</ul>";
 

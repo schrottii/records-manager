@@ -59,6 +59,7 @@ function newSaveData() {
         let loadedSave = JSON.parse(hostedData.substring(config.localStorageKey.length));
         saveData.records = Object.assign(saveData.records, loadedSave.records);
         saveData.catConfig = Object.assign(saveData.catConfig, loadedSave.catConfig);
+        saveData.banLists = Object.assign(saveData.banLists, loadedSave.banLists);
         //console.log(saveData);
         return true;
     }
