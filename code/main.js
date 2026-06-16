@@ -727,6 +727,26 @@ function createNewCategory(name = undefined) {
     renderCategoriesList();
 }
 
+function toggleFavorite() {
+    if (userData.favorites.includes(userData.selected)) {
+        // remove category from favorites
+        userData.favorites.splice(userData.favorites.indexOf(userData.selected), 1);
+    }
+    else {
+        // add to favorites
+        userData.favorites.push(userData.selected);
+    }
+
+    renderEverything();
+}
+
+function searchToggleFavorites() {
+    if (getSetting("searchOnlyFavorites", true) == false) setSetting("searchOnlyFavorites", true);
+    else setSetting("searchOnlyFavorites", false);
+
+    renderCategoriesList();
+}
+
 ////////////////////////////////////////////////
 // render functions
 ////////////////////////////////////////////////
@@ -743,6 +763,7 @@ function renderCategoriesList() {
 
     for (let ID in saveData.records) {
         if (filter != "") {
+            // grabs the player names and other data inside cells
             nameFilters = [];
             for (n of saveData.records[ID]) {
                 for (nn of n) {
@@ -751,15 +772,21 @@ function renderCategoriesList() {
             }
         }
 
-        if (filter == ""
+        // does it match the filter?
+        if ((filter == ""
             || saveData.catConfig[ID].name.toLowerCase().includes(filter)
-            || nameFilters.includes(filter)
+            || nameFilters.includes(filter))
+            && (getSetting("searchOnlyFavorites", false) == false || userData.favorites.includes(ID))
         ) {
+            // matches
+
             if (saveData.catConfig[ID] == undefined) {
+                // weird invalid category
                 console.log(ID, saveData.records[ID], saveData.catConfig[ID]);
                 continue;
             }
 
+            // tree name
             treeName = saveData.catConfig[ID].tree /*&& filter != ""*/ ? ("<small style='font-size: 12px; position: absolute; left: 10px; text-align: left;'>" + saveData.catConfig[ID].tree.split(".")[0] + "> </small><br />") : "";
             if (treeName == treeNamePrev && treeName != "") {
                 treeNamePrev = treeName;
@@ -767,7 +794,11 @@ function renderCategoriesList() {
             }
             else treeNamePrev = treeName;
 
-            render = render + "<button class='listButton' onclick='showCategory(`" + ID + "`)' style='position: relative; " + (userData.selected == ID ? "background-color: light-dark(rgb(255, 255, 180), rgb(0, 0, 75));" : "") + "'>" + treeName + saveData.catConfig[ID].name + "</button><br />";
+            // render list entry
+            render = render + "<button class='listButton' onclick='showCategory(`" + ID + "`)' style='position: relative; " + (userData.selected == ID ? "background-color: light-dark(rgb(255, 255, 180), rgb(0, 0, 75));" : "") + "'>"
+            + treeName
+            + (userData.favorites.includes(ID) ? "<span style='float: left;'>⭐</span>" : "")
+            + saveData.catConfig[ID].name + "</button><br />";
         }
     }
 
@@ -778,7 +809,9 @@ function renderRightSide() {
     let cat = saveData.records[userData.selected];
     if (cat == undefined) return false;
 
-    ui.sectionTitle.innerHTML = saveData.catConfig[userData.selected].name;
+    ui.sectionTitle.innerHTML = "<button onclick='toggleFavorite();' style='float: left;'>" + (userData.favorites.includes(userData.selected) ? "Rem ⭐" : "Add ⭐") + "</button> "
+    + saveData.catConfig[userData.selected].name;
+
     ui.rightSide.innerHTML = (saveData.catConfig[userData.selected].preText ? saveData.catConfig[userData.selected].preText : "")
         + "<div class='tableContainer'>"
         + createTable(userData.selected, cat) + "</div>";

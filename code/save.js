@@ -5,7 +5,8 @@ var userData = {
     selected: "",
     settings: {
 
-    }
+    },
+    favorites: [],
 }
 
 function loadSaveData() {
@@ -23,6 +24,9 @@ function loadUserData() {
         ui.toggleUpsideDown.checked = getSetting("upsideDown");
         ui.toggleGaps.checked = getSetting("gaps");
         ui.toggleShowProfiles.checked = getSetting("showProfiles", true);
+
+        if (userData.favorites == undefined) userData.favorites = [];
+
         return true;
     }
     return false;

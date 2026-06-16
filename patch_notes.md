@@ -122,3 +122,13 @@
 - They can be found in the bottom right (where the other info is)
 - Increased space between buttons
 - Other minor design changes
+
+
+
+## v1.4
+-> Favorites (Categories):
+- New feature for user comfort/QoL
+- Categories have a button in the top left to add/remove it as a favorite
+- Favorites have a star emoji in the list
+- Added a star button next to the search, clicking it toggles the list, to only show favorites
+- Favorites and the favorites search setting are saved in userData
