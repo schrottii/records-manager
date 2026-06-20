@@ -137,6 +137,7 @@
 - Added a simple built-in calculator
 - Found at the bottom of the editing area, resets when switching categories (good)
 - Uses simple JS math / eval, but it does support x for multiplication
+- Copies into clipboard automatically
 
 -> calcColumn catConfig:
 - Can be used to calculate a column based on another one
@@ -146,3 +147,8 @@
 - evidence = amount * amount
 - amount = 777
 - total = red * green * blue
+
+-> Settings:
+- This area is now aligned to the left
+- Only show top 10 is now enabled by default
+- Convert to Wikitext now also copies into clipboard and shows a message, including the amount of characters

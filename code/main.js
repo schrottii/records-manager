@@ -119,6 +119,8 @@ function convertToWikitext() {
     }
 
     console.log(WIKI);
+    navigator.clipboard.writeText(WIKI);
+    alert("Copied into clipboard and written into console\nCharacters: " + WIKI.length);
 }
 
 function sortableValue(v) {

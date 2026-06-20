@@ -94,6 +94,31 @@ hr {
     }
 }
 
+.settingsArea {
+    text-align: left;
+    margin-left: 30%;
+    width: 40%;
+}
+
+    /*
+    .settingsArea button {
+        text-align: center;
+        margin: 0 auto;
+        display: block;
+    }
+*/
+
+    .settingsArea h3 {
+        text-align: center;
+    }
+
+@media only screen and (max-width: 768px) {
+    .settingsArea {
+        margin-left: 5%;
+        width: 90%;
+    }
+}
+
 .leftSide {
     float: left;
     width: 29%;

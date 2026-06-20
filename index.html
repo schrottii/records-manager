@@ -59,25 +59,25 @@
         <hr style="clear:both" />
     </div>
 
-    <h3>Settings and tools</h3>
-    highlight row: <input id="tableSearch" type="search" onblur="renderRightSide();">
-    <br /> <input id="top10" type="checkbox" onchange="renderRightSide();">Only show top 10?
-    <br /> <input id="toggleUpsideDown" type="checkbox" onchange="toggleUpsideDown();">Upside Down?
-    <br /> <input id="toggleGaps" type="checkbox" onchange="toggleGaps();">Show gaps?
-    <br /> <input id="toggleShowProfiles" type="checkbox" onchange="toggleShowProfiles();">Click player to see profile?
-    <br />
-    see player profile: <input id="playerSearch" type="search" onblur="openPlayer();">
-    <br />
-    <button onclick="showRandomCategory()">Random category</button>
+    <div class="settingsArea">
+        <h3>Settings and tools</h3>
+        highlight row: <input id="tableSearch" type="search" onblur="renderRightSide();">
+        <br /> <input id="top10" value="true" type="checkbox" onchange="renderRightSide();">Only show top 10?
+        <br /> <input id="toggleUpsideDown" type="checkbox" onchange="toggleUpsideDown();">Upside Down?
+        <br /> <input id="toggleGaps" type="checkbox" onchange="toggleGaps();">Show gaps?
+        <br /> <input id="toggleShowProfiles" type="checkbox" onchange="toggleShowProfiles();">Click player to see profile?
+        <br />
+        see player profile: <input id="playerSearch" type="search" onblur="openPlayer();">
+        <br />
+        <button onclick="showRandomCategory()">Random category</button>
 
-    <div id="editorOnlySettings">
-        <h3>(Editor mode only)</h3>
-        <button onclick="exportSaveData()">Export data</button>
-        <button onclick="importSaveData()">Import data</button>
-        <br />
-        <button onclick="convertToWikitext()">Convert to Wikitext</button>
-        <br />
-        <button onclick="createNewCategory()">Create new category</button>
+        <div id="editorOnlySettings">
+            <h3>(Editor mode only)</h3>
+            <button onclick="exportSaveData()">Export data</button>
+            <button onclick="importSaveData()">Import data</button>
+            <button onclick="convertToWikitext()">Convert to Wikitext</button>
+            <button onclick="createNewCategory()">Create new category</button>
+        </div>
     </div>
 
     <div id="banListsArea">
