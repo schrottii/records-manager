@@ -132,3 +132,8 @@
 - Favorites have a star emoji in the list
 - Added a star button next to the search, clicking it toggles the list, to only show favorites
 - Favorites and the favorites search setting are saved in userData
+
+-> Calculator:
+- Added a simple built-in calculator
+- Found at the bottom of the editing area, resets when switching categories (good)
+- Uses simple JS math / eval, but it does support x for multiplication

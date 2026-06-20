@@ -8,6 +8,8 @@ var ui = {
     rightSide: document.getElementById("rightSide"),
     editorAreaCategory: document.getElementById("editorAreaCategory"),
     editorAreaRow: document.getElementById("editorAreaRow"),
+    editorAreaCalc: document.getElementById("editorAreaCalc"),
+
     tabTitle: document.getElementById("tabTitle"),
     tabTitle2: document.getElementById("tabTitle2"),
     tabTitle3: document.getElementById("tabTitle3"),
@@ -507,7 +509,31 @@ function editCategory(category = userData.selected) {
     render = render + "<button onclick='copyTableID();'>Copy ID</button>";
     render = render + "<button onclick='moveTable();'>Move table</button>";
 
+    // calc
+    ui.editorAreaCalc.innerHTML = "Calc: <input style='width: 40%;' onkeyup='editorCalc();' id='CALCFIELD'> : <span id='CALCRESULT'>";
+
     ui.editorAreaCategory.innerHTML = render;
+}
+
+function editorCalc() {
+    let content = document.getElementById("CALCFIELD").value;
+    if (content == "") return;
+
+    // x is easier to write, so allow it
+    content.replaceAll("x", "*");
+
+    // using eval for quick and dirty calculation, not particularly stable or safe (shouldn't matter here though)
+    let result;
+    try {
+        result = "" + eval(content);
+    }
+    catch {
+        result = "0";
+        return;
+    }
+
+    navigator.clipboard.writeText(result); // for easier access :)
+    document.getElementById("CALCRESULT").innerHTML = result;
 }
 
 function editCategoryConfig(cfg) {
