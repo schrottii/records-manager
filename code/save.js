@@ -5,7 +5,8 @@ var userData = {
     selected: "",
     settings: {
 
-    }
+    },
+    favorites: [],
 }
 
 function loadSaveData() {
@@ -23,6 +24,10 @@ function loadUserData() {
         ui.toggleUpsideDown.checked = getSetting("upsideDown");
         ui.toggleGaps.checked = getSetting("gaps");
         ui.toggleShowProfiles.checked = getSetting("showProfiles", true);
+
+        if (userData.favorites == undefined) userData.favorites = [];
+        if (userData.favoriteplayers == undefined) userData.favoriteplayers = [];
+
         return true;
     }
     return false;
@@ -57,9 +62,11 @@ function newSaveData() {
         // only load records and their configs from hostedData, not the userData (selected, settings)
         // this is because on the user side it always resets, so you don't want to reset those
         let loadedSave = JSON.parse(hostedData.substring(config.localStorageKey.length));
+
         saveData.records = Object.assign(saveData.records, loadedSave.records);
         saveData.catConfig = Object.assign(saveData.catConfig, loadedSave.catConfig);
         saveData.banLists = Object.assign(saveData.banLists, loadedSave.banLists);
+
         //console.log(saveData);
         return true;
     }
@@ -106,4 +113,4 @@ function setSetting(name, value) {
     userData.settings[name] = value;
 }
 
-setInterval(() => saveSaveData(), 5000);
+setInterval(saveSaveData, 5000);

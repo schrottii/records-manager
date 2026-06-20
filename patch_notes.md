@@ -122,3 +122,39 @@
 - They can be found in the bottom right (where the other info is)
 - Increased space between buttons
 - Other minor design changes
+
+
+
+## v1.4 (2026-06-20)
+-> Favorites (Categories):
+- New feature for user comfort/QoL
+- Categories have a button in the top left to add/remove it as a favorite
+- Favorites have a star emoji in the list
+- Added a star button next to the search, clicking it toggles a filter for the list, to only show favorites
+- Favorites and the favorites search setting are saved in userData
+
+-> Favorites (Players):
+- Player profiles can also be marked as favorites
+- These can then be accessed with a new button in the Settings area
+- Doing so turns the categories list into a list of favorite players, using search or the favorite category filter turns it back
+
+-> Calculator:
+- Added a simple built-in calculator
+- Found at the bottom of the editing area, resets when switching categories (good)
+- Uses simple JS math / eval, but it does support x for multiplication
+- Copies into clipboard automatically
+
+-> calcColumn catConfig:
+- Can be used to calculate a column based on another one
+- Supports simple JS math / eval, no x for multiplication
+- Other columns are used via their header names (case insensitive)
+- Examples:
+- evidence = amount * amount
+- amount = 777
+- total = red * green * blue
+
+-> Settings:
+- Added "Show favorite players"
+- This area is now aligned to the left
+- Only show top 10 is now enabled by default
+- Convert to Wikitext now also copies into clipboard and shows a message, including the amount of characters

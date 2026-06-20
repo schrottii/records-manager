@@ -8,6 +8,8 @@ var ui = {
     rightSide: document.getElementById("rightSide"),
     editorAreaCategory: document.getElementById("editorAreaCategory"),
     editorAreaRow: document.getElementById("editorAreaRow"),
+    editorAreaCalc: document.getElementById("editorAreaCalc"),
+
     tabTitle: document.getElementById("tabTitle"),
     tabTitle2: document.getElementById("tabTitle2"),
     tabTitle3: document.getElementById("tabTitle3"),
@@ -34,7 +36,7 @@ var editor = {
 }
 
 var catConfigs = [
-    "name", "header", "sorter", "ascending", "preText", "tree", "exportRowsLimit", "isRecordPoints"
+    "name", "header", "sorter", "ascending", "preText", "tree", "exportRowsLimit", "isRecordPoints", "calcColumn"
 ];
 
 ////////////////////////////////////////////////
@@ -117,6 +119,8 @@ function convertToWikitext() {
     }
 
     console.log(WIKI);
+    navigator.clipboard.writeText(WIKI);
+    alert("Copied into clipboard and written into console\nCharacters: " + WIKI.length);
 }
 
 function sortableValue(v) {
@@ -319,7 +323,58 @@ function createTable(name, og_content) {
     let table = "{|\n" + saveData.catConfig[name].header;
 
     let sorter = saveData.catConfig[name].sorter;
+    let calcColumn = saveData.catConfig[name].calcColumn;
     let headers = getHeaders(name);
+
+    // calcColumn
+    if (calcColumn != undefined && calcColumn.includes("=")) {
+        let calcMath = calcColumn.split("=")[1]; // math after the = part
+        calcColumn = calcColumn.split("=")[0].toLowerCase().trim(); // cleaned up column name
+        //calcMath = calcMath.replaceAll("x", "*");
+        //console.log(calcColumn, calcMath);
+
+        if (headers.includes(calcColumn)) {
+            let index = headers.indexOf(calcColumn.toLowerCase()); // which column 
+            if (index != undefined) {
+                // only execute if we can find the row
+                index -= 1;
+                let math;
+                //console.log(index);
+
+                for (let c of content) {
+                    //console.log(c[index]);
+                    math = calcMath;
+                    //console.log(math);
+                    for (let ci in c) {
+                        //console.log(ci, c[ci], headers[parseInt(ci) + 1]);
+                        if (math.includes(headers[parseInt(ci) + 1])) {
+                            //console.log(headers[parseInt(ci) + 1], c[ci]);
+                            math = math.replaceAll(headers[parseInt(ci) + 1], c[ci]);
+                            math = math.replaceAll(",", "");
+                            //console.log(math);
+                        }
+                    }
+
+                    if (math.includes("+") || math.includes("-") || math.includes("*") || math.includes("/")) {
+                        try {
+                            math = "" + eval(math);
+                        }
+                        catch { }
+                    }
+
+                    // add ,s
+                    math = math.trim();
+                    let i = 0;
+                    for (let char = math.length - 1; char >= 0; char--) {
+                        if (i == 2 && char > 0) math = math.substr(0, char) + "," + math.substr(char);
+                        i = (i + 1) % 3;
+                    }
+
+                    c[index] = math;
+                }
+            }
+        }
+    }
 
     // gaps
     let sortID = headers.indexOf(saveData.catConfig[name].sorter) - 1;
@@ -507,7 +562,31 @@ function editCategory(category = userData.selected) {
     render = render + "<button onclick='copyTableID();'>Copy ID</button>";
     render = render + "<button onclick='moveTable();'>Move table</button>";
 
+    // calc
+    ui.editorAreaCalc.innerHTML = "Calc: <input style='width: 40%;' onkeyup='editorCalc();' id='CALCFIELD'> : <span id='CALCRESULT'>";
+
     ui.editorAreaCategory.innerHTML = render;
+}
+
+function editorCalc() {
+    let content = document.getElementById("CALCFIELD").value;
+    if (content == "") return;
+
+    // x is easier to write, so allow it
+    content.replaceAll("x", "*");
+
+    // using eval for quick and dirty calculation, not particularly stable or safe (shouldn't matter here though)
+    let result;
+    try {
+        result = "" + eval(content);
+    }
+    catch {
+        result = "0";
+        return;
+    }
+
+    navigator.clipboard.writeText(result); // for easier access :)
+    document.getElementById("CALCRESULT").innerHTML = result;
 }
 
 function editCategoryConfig(cfg) {
@@ -727,6 +806,40 @@ function createNewCategory(name = undefined) {
     renderCategoriesList();
 }
 
+function toggleFavorite() {
+    if (userData.favorites.includes(userData.selected)) {
+        // remove category from favorites
+        userData.favorites.splice(userData.favorites.indexOf(userData.selected), 1);
+    }
+    else {
+        // add to favorites
+        userData.favorites.push(userData.selected);
+    }
+
+    renderEverything();
+}
+
+function toggleFavoritePlayer() {
+    if (userData.favoriteplayers.includes(currentPlayer)) {
+        // remove category from favorites
+        userData.favoriteplayers.splice(userData.favoriteplayers.indexOf(currentPlayer), 1);
+    }
+    else {
+        // add to favorites
+        userData.favoriteplayers.push(currentPlayer);
+    }
+
+    showFavoritePlayers();
+    renderRightSideProfile();
+}
+
+function searchToggleFavorites() {
+    if (getSetting("searchOnlyFavorites", true) == false) setSetting("searchOnlyFavorites", true);
+    else setSetting("searchOnlyFavorites", false);
+
+    renderCategoriesList();
+}
+
 ////////////////////////////////////////////////
 // render functions
 ////////////////////////////////////////////////
@@ -743,6 +856,7 @@ function renderCategoriesList() {
 
     for (let ID in saveData.records) {
         if (filter != "") {
+            // grabs the player names and other data inside cells
             nameFilters = [];
             for (n of saveData.records[ID]) {
                 for (nn of n) {
@@ -751,15 +865,21 @@ function renderCategoriesList() {
             }
         }
 
-        if (filter == ""
+        // does it match the filter?
+        if ((filter == ""
             || saveData.catConfig[ID].name.toLowerCase().includes(filter)
-            || nameFilters.includes(filter)
+            || nameFilters.includes(filter))
+            && (getSetting("searchOnlyFavorites", false) == false || userData.favorites.includes(ID))
         ) {
+            // matches
+
             if (saveData.catConfig[ID] == undefined) {
+                // weird invalid category
                 console.log(ID, saveData.records[ID], saveData.catConfig[ID]);
                 continue;
             }
 
+            // tree name
             treeName = saveData.catConfig[ID].tree /*&& filter != ""*/ ? ("<small style='font-size: 12px; position: absolute; left: 10px; text-align: left;'>" + saveData.catConfig[ID].tree.split(".")[0] + "> </small><br />") : "";
             if (treeName == treeNamePrev && treeName != "") {
                 treeNamePrev = treeName;
@@ -767,7 +887,11 @@ function renderCategoriesList() {
             }
             else treeNamePrev = treeName;
 
-            render = render + "<button class='listButton' onclick='showCategory(`" + ID + "`)' style='position: relative; " + (userData.selected == ID ? "background-color: light-dark(rgb(255, 255, 180), rgb(0, 0, 75));" : "") + "'>" + treeName + saveData.catConfig[ID].name + "</button><br />";
+            // render list entry
+            render = render + "<button class='listButton' onclick='showCategory(`" + ID + "`)' style='position: relative; " + (userData.selected == ID ? "background-color: light-dark(rgb(255, 255, 180), rgb(0, 0, 75));" : "") + "'>"
+            + treeName
+            + (userData.favorites.includes(ID) ? "<span style='float: left;'>⭐</span>" : "")
+            + saveData.catConfig[ID].name + "</button><br />";
         }
     }
 
@@ -778,7 +902,9 @@ function renderRightSide() {
     let cat = saveData.records[userData.selected];
     if (cat == undefined) return false;
 
-    ui.sectionTitle.innerHTML = saveData.catConfig[userData.selected].name;
+    ui.sectionTitle.innerHTML = "<button onclick='toggleFavorite();' class='favoriteButton'>" + (userData.favorites.includes(userData.selected) ? "Rem ⭐" : "Add ⭐") + "</button> "
+    + saveData.catConfig[userData.selected].name;
+
     ui.rightSide.innerHTML = (saveData.catConfig[userData.selected].preText ? saveData.catConfig[userData.selected].preText : "")
         + "<div class='tableContainer'>"
         + createTable(userData.selected, cat) + "</div>";
@@ -794,6 +920,8 @@ function renderEverything() {
 
     renderBanLists();
 }
+
+
 
 function initializeManager() {
     // boots up the program

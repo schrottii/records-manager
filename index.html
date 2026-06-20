@@ -36,7 +36,7 @@
     <div style="background-color: rgb(20, 20, 20, 0.5);">
         <!-- left side -->
         <div class="leftSide">
-            search: <br />
+            <button onclick="searchToggleFavorites();" style="float: left;">⭐</button> search: <br />
             <input id="categoriesSearch" type="search" onkeyup="renderCategoriesList();" style="width: 98%;">
 
             <div class="leftSideList">
@@ -54,29 +54,31 @@
             <br />
             <span id="rightSide"></span>
             <span id="editorAreaRow"></span>
+            <span id="editorAreaCalc"></span>
         </div>
         <hr style="clear:both" />
     </div>
 
-    <h3>Settings and tools</h3>
-    highlight row: <input id="tableSearch" type="search" onblur="renderRightSide();">
-    <br /> <input id="top10" type="checkbox" onchange="renderRightSide();">Only show top 10?
-    <br /> <input id="toggleUpsideDown" type="checkbox" onchange="toggleUpsideDown();">Upside Down?
-    <br /> <input id="toggleGaps" type="checkbox" onchange="toggleGaps();">Show gaps?
-    <br /> <input id="toggleShowProfiles" type="checkbox" onchange="toggleShowProfiles();">Click player to see profile?
-    <br />
-    see player profile: <input id="playerSearch" type="search" onblur="openPlayer();">
-    <br />
-    <button onclick="showRandomCategory()">Random category</button>
+    <div class="settingsArea">
+        <h3>Settings and tools</h3>
+        highlight row: <input id="tableSearch" type="search" onblur="renderRightSide();">
+        <br /> <input id="top10" value="true" type="checkbox" onchange="renderRightSide();">Only show top 10?
+        <br /> <input id="toggleUpsideDown" type="checkbox" onchange="toggleUpsideDown();">Upside Down?
+        <br /> <input id="toggleGaps" type="checkbox" onchange="toggleGaps();">Show gaps?
+        <br /> <input id="toggleShowProfiles" type="checkbox" onchange="toggleShowProfiles();">Click player to see profile?
+        <br />
+        see player profile: <input id="playerSearch" type="search" onblur="openPlayer();">
+        <br />
+        <button onclick="showRandomCategory()">Random category</button>
+        <button onclick="showFavoritePlayers()">Show favorite players</button>
 
-    <div id="editorOnlySettings">
-        <h3>(Editor mode only)</h3>
-        <button onclick="exportSaveData()">Export data</button>
-        <button onclick="importSaveData()">Import data</button>
-        <br />
-        <button onclick="convertToWikitext()">Convert to Wikitext</button>
-        <br />
-        <button onclick="createNewCategory()">Create new category</button>
+        <div id="editorOnlySettings">
+            <h3>(Editor mode only)</h3>
+            <button onclick="exportSaveData()">Export data</button>
+            <button onclick="importSaveData()">Import data</button>
+            <button onclick="convertToWikitext()">Convert to Wikitext</button>
+            <button onclick="createNewCategory()">Create new category</button>
+        </div>
     </div>
 
     <div id="banListsArea">
@@ -89,12 +91,15 @@
     <hr />
     <div style="float: right; text-align: right;">
         <span id="tabTitle3"></span> using <br />
-        Records Manager v1.3 <br />
+        Records Manager v1.4 <br />
         Made by Schrottii/Balnoom &copy; 2025-2026 <br />
         <a href="LICENSE.md" target="_blank"><b>LICENSE</b></a> -
         <a href="TOS.md" target="_blank">TOS</a> -
         <a href="PRIVACY.md" target="_blank">PRIVACY POLICY</a>
         <br />
+        <br />
+
+        <a href="https://schrottii.github.io/" target="_blank">link to my other projects</a><br />
         <br />
 
         <a href="https://schrottii.github.io/" target="_blank">link to my other projects</a><br />

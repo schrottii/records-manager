@@ -1,13 +1,18 @@
-function renderRightSideProfile(player) {
-    ui.sectionTitle.innerHTML = player;
-    ui.editorAreaCategory.innerHTML = "";
+﻿function renderRightSideProfile(player = currentPlayer) {
+    currentPlayer = player;
 
-    ui.rightSide.innerHTML = "<button style='float: left;' onclick='renderRightSide();'>Back</button><br style='clear: both;' />"
+    ui.sectionTitle.innerHTML = "<button onclick='toggleFavoritePlayer();' class='favoriteButton'>" + (userData.favoriteplayers.includes(currentPlayer) ? "Rem ⭐" : "Add ⭐") + "</button> "
+        + player;
+
+    ui.rightSide.innerHTML = "<button class='favoriteButton' onclick='renderRightSide();'>Back</button>"//<br style='clear: both;' />"
         + renderPlayerBanStatus(player)
         + renderPlayerPoints(player);
 
+    ui.editorAreaCategory.innerHTML = "";
     ui.editorAreaRow.innerHTML = "";
 }
+
+let currentPlayer = "";
 
 function renderPlayerPoints(player) {
     // function to figure out all the cool statistics for a player
@@ -55,7 +60,7 @@ function renderPlayerPoints(player) {
     // list of all categories they are in
     let colorflick = "white";
 
-    ren += "All categories:<table style='text-align: left;'>";
+    ren += "All categories:<table style='text-align: left; margin-left: 5%;'>";
     ren += "<tr style='color: gold;'><td>Category</td><td>Placement</td><td>Record Points</td></tr>";
     for (let cat in points) {
         ren += "<tr style='color: " + (points[cat] == 10 ? "gold" : points[cat] >= 8 ? "silver" : colorflick) + ";'><td><li>" + saveData.catConfig[cat].name + ": </li></td>"
@@ -101,9 +106,18 @@ function renderPlayerBanStatus(player) {
     return ren;
 }
 
-function openPlayer() {
-    let player = ui.playerSearch.value;
+function openPlayer(player = ui.playerSearch.value) {
     if (player == "" || player == undefined || player == false) return;
 
     renderRightSideProfile(player);
+}
+
+function showFavoritePlayers() {
+    let render = "";
+    for (let playerName of userData.favoriteplayers) {
+        render = render + "<button class='listButton' onclick='openPlayer(`" + playerName + "`); showFavoritePlayers();' style='position: relative; " + (currentPlayer == playerName ? "background-color: light-dark(rgb(255, 255, 180), rgb(0, 0, 75));" : "") + "'>"
+            + (userData.favoriteplayers.includes(playerName) ? "<span style='float: left;'>⭐</span>" : "")
+            + playerName + "</button><br />";
+    }
+    ui.leftSide.innerHTML = render;
 }
