@@ -112,10 +112,19 @@ hr {
         text-align: center;
     }
 
+.favoriteButton {
+    position: absolute;
+    left: 31%;
+}
+
 @media only screen and (max-width: 768px) {
     .settingsArea {
         margin-left: 5%;
         width: 90%;
+    }
+
+    .favoriteButton {
+        left: 2%;
     }
 }
 

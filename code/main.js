@@ -344,14 +344,14 @@ function createTable(name, og_content) {
                 for (let c of content) {
                     //console.log(c[index]);
                     math = calcMath;
-                    console.log(math);
+                    //console.log(math);
                     for (let ci in c) {
-                        console.log(ci, c[ci], headers[parseInt(ci) + 1]);
+                        //console.log(ci, c[ci], headers[parseInt(ci) + 1]);
                         if (math.includes(headers[parseInt(ci) + 1])) {
-                            console.log(headers[parseInt(ci) + 1], c[ci]);
+                            //console.log(headers[parseInt(ci) + 1], c[ci]);
                             math = math.replaceAll(headers[parseInt(ci) + 1], c[ci]);
                             math = math.replaceAll(",", "");
-                            console.log(math);
+                            //console.log(math);
                         }
                     }
 
@@ -819,6 +819,20 @@ function toggleFavorite() {
     renderEverything();
 }
 
+function toggleFavoritePlayer() {
+    if (userData.favoriteplayers.includes(currentPlayer)) {
+        // remove category from favorites
+        userData.favoriteplayers.splice(userData.favoriteplayers.indexOf(currentPlayer), 1);
+    }
+    else {
+        // add to favorites
+        userData.favoriteplayers.push(currentPlayer);
+    }
+
+    showFavoritePlayers();
+    renderRightSideProfile();
+}
+
 function searchToggleFavorites() {
     if (getSetting("searchOnlyFavorites", true) == false) setSetting("searchOnlyFavorites", true);
     else setSetting("searchOnlyFavorites", false);
@@ -888,7 +902,7 @@ function renderRightSide() {
     let cat = saveData.records[userData.selected];
     if (cat == undefined) return false;
 
-    ui.sectionTitle.innerHTML = "<button onclick='toggleFavorite();' style='float: left;'>" + (userData.favorites.includes(userData.selected) ? "Rem ⭐" : "Add ⭐") + "</button> "
+    ui.sectionTitle.innerHTML = "<button onclick='toggleFavorite();' class='favoriteButton'>" + (userData.favorites.includes(userData.selected) ? "Rem ⭐" : "Add ⭐") + "</button> "
     + saveData.catConfig[userData.selected].name;
 
     ui.rightSide.innerHTML = (saveData.catConfig[userData.selected].preText ? saveData.catConfig[userData.selected].preText : "")
@@ -906,6 +920,8 @@ function renderEverything() {
 
     renderBanLists();
 }
+
+
 
 function initializeManager() {
     // boots up the program

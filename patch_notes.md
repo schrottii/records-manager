@@ -130,8 +130,13 @@
 - New feature for user comfort/QoL
 - Categories have a button in the top left to add/remove it as a favorite
 - Favorites have a star emoji in the list
-- Added a star button next to the search, clicking it toggles the list, to only show favorites
+- Added a star button next to the search, clicking it toggles a filter for the list, to only show favorites
 - Favorites and the favorites search setting are saved in userData
+
+-> Favorites (Players):
+- Player profiles can also be marked as favorites
+- These can then be accessed with a new button in the Settings area
+- Doing so turns the categories list into a list of favorite players, using search or the favorite category filter turns it back
 
 -> Calculator:
 - Added a simple built-in calculator
@@ -149,6 +154,7 @@
 - total = red * green * blue
 
 -> Settings:
+- Added "Show favorite players"
 - This area is now aligned to the left
 - Only show top 10 is now enabled by default
 - Convert to Wikitext now also copies into clipboard and shows a message, including the amount of characters
