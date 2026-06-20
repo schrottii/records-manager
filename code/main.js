@@ -36,7 +36,7 @@ var editor = {
 }
 
 var catConfigs = [
-    "name", "header", "sorter", "ascending", "preText", "tree", "exportRowsLimit", "isRecordPoints"
+    "name", "header", "sorter", "ascending", "preText", "tree", "exportRowsLimit", "isRecordPoints", "calcColumn"
 ];
 
 ////////////////////////////////////////////////
@@ -321,7 +321,58 @@ function createTable(name, og_content) {
     let table = "{|\n" + saveData.catConfig[name].header;
 
     let sorter = saveData.catConfig[name].sorter;
+    let calcColumn = saveData.catConfig[name].calcColumn;
     let headers = getHeaders(name);
+
+    // calcColumn
+    if (calcColumn != undefined && calcColumn.includes("=")) {
+        let calcMath = calcColumn.split("=")[1]; // math after the = part
+        calcColumn = calcColumn.split("=")[0].toLowerCase().trim(); // cleaned up column name
+        //calcMath = calcMath.replaceAll("x", "*");
+        //console.log(calcColumn, calcMath);
+
+        if (headers.includes(calcColumn)) {
+            let index = headers.indexOf(calcColumn.toLowerCase()); // which column 
+            if (index != undefined) {
+                // only execute if we can find the row
+                index -= 1;
+                let math;
+                //console.log(index);
+
+                for (let c of content) {
+                    //console.log(c[index]);
+                    math = calcMath;
+                    console.log(math);
+                    for (let ci in c) {
+                        console.log(ci, c[ci], headers[parseInt(ci) + 1]);
+                        if (math.includes(headers[parseInt(ci) + 1])) {
+                            console.log(headers[parseInt(ci) + 1], c[ci]);
+                            math = math.replaceAll(headers[parseInt(ci) + 1], c[ci]);
+                            math = math.replaceAll(",", "");
+                            console.log(math);
+                        }
+                    }
+
+                    if (math.includes("+") || math.includes("-") || math.includes("*") || math.includes("/")) {
+                        try {
+                            math = "" + eval(math);
+                        }
+                        catch { }
+                    }
+
+                    // add ,s
+                    math = math.trim();
+                    let i = 0;
+                    for (let char = math.length - 1; char >= 0; char--) {
+                        if (i == 2 && char > 0) math = math.substr(0, char) + "," + math.substr(char);
+                        i = (i + 1) % 3;
+                    }
+
+                    c[index] = math;
+                }
+            }
+        }
+    }
 
     // gaps
     let sortID = headers.indexOf(saveData.catConfig[name].sorter) - 1;

@@ -137,3 +137,12 @@
 - Added a simple built-in calculator
 - Found at the bottom of the editing area, resets when switching categories (good)
 - Uses simple JS math / eval, but it does support x for multiplication
+
+-> calcColumn catConfig:
+- Can be used to calculate a column based on another one
+- Supports simple JS math / eval, no x for multiplication
+- Other columns are used via their header names (case insensitive)
+- Examples:
+- evidence = amount * amount
+- amount = 777
+- total = red * green * blue
