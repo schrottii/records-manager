@@ -125,7 +125,7 @@
 
 
 
-## v1.4
+## v1.4 (2026-06-20)
 -> Favorites (Categories):
 - New feature for user comfort/QoL
 - Categories have a button in the top left to add/remove it as a favorite
