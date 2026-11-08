@@ -7,7 +7,7 @@ total records
 sortTable(generateRecordPointsTable(getRecordPoints(true)));
 */
 
-function getRecordPoints(countSingle = false, singleplayer = false) {
+function getRecordPoints(countSingle = false, singleplayer = false, includeRP = false) {
     let players = {};
     let recordCategory;
     //let recordCatconfig;
@@ -16,6 +16,7 @@ function getRecordPoints(countSingle = false, singleplayer = false) {
 
     for (let r in saveData.records) {
         recordCategory = saveData.records[r];
+        if ((saveData.catConfig[r].isRecordPoints === "true" || saveData.catConfig[r].isRecordPoints === "total") && includeRP == false) continue;
         //recordCatconfig = saveData.catConfig[r];
 
         // a bit unoptimized code, but eh, it tries to find the column that has the player names

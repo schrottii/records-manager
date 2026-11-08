@@ -39,6 +39,20 @@ var catConfigs = [
     "name", "header", "sorter", "ascending", "preText", "tree", "exportRowsLimit", "isRecordPoints", "calcColumn"
 ];
 
+var linkIcons = [
+    ["https://cdn.discordapp.com", "images/linkicons/discordimage.png"],
+    ["https://media.discordapp.net", "images/linkicons/discordimage.png"],
+    ["https://discord.com/channels", "images/linkicons/discordlink.png"],
+    ["https://imgur.com/a", "images/linkicons/imgur.png"],
+    ["https://youtu.be", "images/linkicons/youtube.png"],
+    ["https://www.youtube.com/watch", "images/linkicons/youtube.png"],
+    ["https://youtube.com/watch", "images/linkicons/youtube.png"],
+    ["https://www.youtube.com/shorts", "images/linkicons/youtubeshorts.png"],
+    ["https://youtube.com/shorts", "images/linkicons/youtubeshorts.png"],
+    ["https://www.cloud.mail.ru", "images/linkicons/cloudmailru.png"],
+    ["https://cloud.mail.ru", "images/linkicons/cloudmailru.png"],
+];
+
 ////////////////////////////////////////////////
 // core functions
 ////////////////////////////////////////////////
@@ -162,7 +176,6 @@ function sortableValue(v) {
     else if (v.toLowerCase().includes("min")) return parseInt(v);
 
     // normal notation numbers
-    let normalNotation = "kMBTQqSsOND".split("");
     if (normalNotation.includes(v.trim().substr(-1))) {
         let index = normalNotation.indexOf(v.trim().substr(-1));
         let e = Math.pow(1000, index + 1); // +1 cuz index starts at 0 (K = 0)
@@ -179,6 +192,18 @@ function sortableValue(v) {
     return parseInt(v);
 }
 
+var normalNotation = "kMBTQqSsOND?".split("");
+
+function formatNumber(num) {
+    // why do I always re-write new fn and formatNumber functions instead of ever re-using one :joy:
+    num = "" + num;
+    if (num == "undefined") return "";
+    if (num.length < 4) return num;
+    if (num.includes("e+")) num = num.split("e+")[0] + "0".repeat(num.split("e+")[1] - (num.split("e+")[0].length - 1))
+    let pos = Math.floor((num.length - 4) / 3);
+    return num.substr(0, Math.max(1, (num.length - 4) % 3 + 1)) + "." + num.substr((num.length - 4) % 3 + 1, 2) + normalNotation[Math.min(pos, normalNotation.length - 1)];
+}
+
 function toggleUpsideDown() {
     setSetting("upsideDown", ui.toggleUpsideDown.checked);
     sortTable();
@@ -191,6 +216,11 @@ function toggleGaps() {
 
 function toggleShowProfiles() {
     setSetting("showProfiles", ui.toggleShowProfiles.checked);
+}
+
+function toggleCatConfigsArea() {
+    setSetting("showCatConfigs", !getSetting("showCatConfigs", false));
+    editCategory();
 }
 
 ////////////////////////////////////////////////
@@ -242,7 +272,9 @@ function loadCategoryFromWiki(wikiContent) {
             if (contentPush.length == 0) last = 0;
             else last = 1;
 
-            if (!line.includes("||") || line.split("[http").length > 2) contentPush[contentPush.length - last] = contentPush[contentPush.length - last] + line.substr(line.indexOf("[http"));
+            if (!line.includes("||") || line.split("[http").length > 2) {
+                contentPush[contentPush.length - last] = contentPush[contentPush.length - last] + line.substr(line.indexOf("[http"));
+            }
 
             multiLiner = true;
             lineSplit = undefined;
@@ -362,15 +394,17 @@ function createTable(name, og_content) {
                         catch { }
                     }
 
-                    // add ,s
                     math = math.trim();
+                    /*
+                    // add ,s
                     let i = 0;
                     for (let char = math.length - 1; char >= 0; char--) {
                         if (i == 2 && char > 0) math = math.substr(0, char) + "," + math.substr(char);
                         i = (i + 1) % 3;
                     }
+                    */
 
-                    c[index] = math;
+                    c[index] = formatNumber(math);
                 }
             }
         }
@@ -392,6 +426,7 @@ function createTable(name, og_content) {
     // render - convert code to wiki (and then to html)
     let cclass = "";
     let cclick = "";
+    let crowclick = "";
 
     let prevValue = "";
     let prevCount = -1;
@@ -405,10 +440,11 @@ function createTable(name, og_content) {
 
         // clickable in editor mode
         //if (config.editorMode)
-        cclick = "onclick='clickRow(" + counter + ")' ";
+        cclick = "onclick='clickCell(" + counter + ")' ";
+        crowclick = "onclick='clickRow(" + counter + ")' ";
 
         // ties
-        if (sorter != undefined && prevValue == c[sortID].split("<s")[0]) {
+        if (sorter != undefined && c[sortID] != undefined && prevValue == c[sortID].split("<s")[0]) {
             if (prevCount == -1) prevCount = counter - 1;
         }
         else {
@@ -416,14 +452,19 @@ function createTable(name, og_content) {
             prevValue = "";
         }
 
-        // add content
-        table = table + "\n|-\n| " + cclass + cclick
+        // add content - new row
+        table = table + "\n|-\n| " + cclass + crowclick
             + (prevCount != -1 ? ("=" + prevCount) : counter) + ".";
-        for (let cc of c) {
-            table = table + "||" + cc;
+
+        // parts of the row
+        for (let cc in c) {
+            if (headers[parseInt(cc) + 1] == "player" || headers[parseInt(cc) + 1] == "participant") {
+                table = table + "||" + cclick + c[cc];
+            }
+            else table = table + "||" + c[cc];
         }
 
-        if (sorter != undefined) prevValue = c[sortID].split("<s")[0]; // also for ties
+        if (sorter != undefined && c[sortID] != undefined) prevValue = c[sortID].split("<s")[0]; // also for ties
 
         // used for 1./2./3. and top 10 limiter
         counter++;
@@ -431,8 +472,14 @@ function createTable(name, og_content) {
     }
     table = table + "\n|}";
 
-    return formatTableFromHTML(tableFromWiki(table),
+    let formattedTable = formatTableFromHTML(tableFromWiki(table),
         { tableClass: "tableClass", headerClass: "headerClass", rowClass: "rowClass" });
+
+    // link icons
+    for (let li of linkIcons) {
+        formattedTable = formattedTable.replaceAll(`<a target="_blank" href="` + li[0], "<img src='" + li[1] + "' class='linkIcon' /> " + `<a target="_blank" href="`+ li[0]);
+    }
+    return formattedTable;
 }
 
 function showCategory(name) {
@@ -460,26 +507,50 @@ function showRandomCategory(){
 // edit row functions
 ////////////////////////////////////////////////
 
-function clickRow(row) {
-    let playerPos = saveData.records[userData.selected][row - 1][saveData.catConfig[userData.selected].header.split("!!").indexOf(" Player ") - 1];
-    
+function clickCell(row = editor.row) {
     if (!config.editorMode) {
         // no edit mode... wanna see the player?
+        let playerPos = saveData.records[userData.selected][row - 1][saveData.catConfig[userData.selected].header.split("!!").indexOf(" Player ") - 1];
         if (getSetting("showProfiles")) renderRightSideProfile(playerPos);
         return;
     }
+}
 
+function clickRow(row = editor.row) {
+    if (!config.editorMode) return;
+    let playerPos = saveData.records[userData.selected][row - 1][saveData.catConfig[userData.selected].header.split("!!").indexOf(" Player ") - 1];
+    
     // select this one to edit
     editor.row = row;
 
     // render cells for editing
     let render = "<h4>Edit row:</h4><table style='width: 98%;'>";
 
+    let columnsFound = 0;
+    let headers = saveData.catConfig[userData.selected].header.split("!!");
+
+    // gather columns via existing data, and grab that data
     for (let c in saveData.records[userData.selected][row - 1]) {
-        render += "<tr><td>" + saveData.catConfig[userData.selected].header.split("!!")[parseInt(c) + 1] // +1 to ignore place
+        render += "<tr><td>" + headers[parseInt(c) + 1] // +1 to ignore place
             + "</td><td><input id='cell-" + c + "' onblur='editCell(" + c + ")' type='text' style='width: 90%; text-align: left;' value='"
-            + saveData.records[userData.selected][row - 1][c] + "'></input></td></tr>";
+            + saveData.records[userData.selected][row - 1][c] + "'></input>"
+            + "<button onclick='deleteCell(" + c + ")'><big>X</big></button>"
+            + "</td></tr>";
+
+        columnsFound++;
     }
+
+    // this category might have more columns that this specific row happens to not have, grab them from the headers
+    if (headers.length - 1 > columnsFound) { // -1 to ignore place
+        for (let c = columnsFound; c < headers.length - 1; c++) {
+            render += "<tr><td>" + headers[parseInt(c) + 1] // +1 to ignore place
+                + "</td><td><input id='cell-" + c + "' onblur='editCell(" + c + ")' type='text' style='width: 90%; text-align: left;' value='"
+                + saveData.records[userData.selected][row - 1][c] + "'></input>"
+                + "<button onclick='deleteCell(" + c + ")'><big>X</big></button>"
+                + "</td></tr>";
+        }
+    }
+
     render += "</table>";
 
     // more buttons
@@ -519,10 +590,41 @@ function editCell(nr) {
     renderRightSide();
 }
 
+function deleteCell(nr) {
+    if (!config.editorMode) return false;
+
+    //saveData.records[userData.selected][editor.row - 1].splice(nr, 1);
+    // delete if last, clear if not (likely more wanted in most cases)
+    if (nr == saveData.records[userData.selected][editor.row - 1].length - 1) {
+        saveData.records[userData.selected][editor.row - 1].pop();
+    }
+    else {
+        saveData.records[userData.selected][editor.row - 1][nr] = "";
+    }
+
+    sortTable();
+    renderRightSide();
+    clickRow();
+}
+
 function deletePlayer(player) {
     if (!config.editorMode) return false;
 
+    // gather data first
     let table;
+    let categoryNames = [];
+
+    for (let t in saveData.records) {
+        table = saveData.records[t];
+        for (let row in table) {
+            //if (table[row].includes(player)) deleteRow(t, parseInt(row) + 1);
+            if (table[row].includes(player)) categoryNames.push(saveData.catConfig[t].name);
+        }
+    }
+
+    if (confirm("Delete " + player + "? (" + categoryNames.length + " entries)\n" + categoryNames.toString()) == false) return false;
+
+    // delete, alright!
     for (let t in saveData.records) {
         table = saveData.records[t];
         for (let row in table) {
@@ -543,17 +645,20 @@ function editCategory(category = userData.selected) {
     if (!config.editorMode) return false;
     editor.category = category;
 
+    let isCatConfigsOpen = getSetting("showCatConfigs", true);
     let render = "<h4>Edit category:</h4><table style='width: 98%;'>";
 
     // render editable config for the category
-    for (let cfg of catConfigs) {
-        render = render + "<tr><td style='width: 30%; text-align: left;'>"
-            + cfg + ":</td><td>"
-            + "<input style='width: 95%;' id='cfg-" + cfg
-            + "' value='" + (saveData.catConfig[category][cfg] !== undefined ? saveData.catConfig[category][cfg] : "")
-            + "' onblur='editCategoryConfig(`" + cfg + "`)'></input></td></tr>";
+    if (isCatConfigsOpen) {
+        for (let cfg of catConfigs) {
+            render = render + "<tr><td style='width: 30%; text-align: left;'>"
+                + cfg + ":</td><td>"
+                + "<input style='width: 95%;' id='cfg-" + cfg
+                + "' value='" + (saveData.catConfig[category][cfg] !== undefined ? saveData.catConfig[category][cfg] : "")
+                + "' onblur='editCategoryConfig(`" + cfg + "`)'></input></td></tr>";
+        }
+        render += "</table>";
     }
-    render += "</table>";
 
     // buttons
     render = render + "<button onclick='sortTable();'>Sort table</button>";
@@ -561,6 +666,7 @@ function editCategory(category = userData.selected) {
     render = render + "<button onclick='addTableRowEmpty();'>Add empty row</button>";
     render = render + "<button onclick='copyTableID();'>Copy ID</button>";
     render = render + "<button onclick='moveTable();'>Move table</button>";
+    render = render + "<button onclick='toggleCatConfigsArea()'>Toggle catConfigs area</button>";
 
     // calc
     ui.editorAreaCalc.innerHTML = "Calc: <input style='width: 40%;' onkeyup='editorCalc();' id='CALCFIELD'> : <span id='CALCRESULT'>";
@@ -631,19 +737,26 @@ function addTableRow() {
 
     // duplicatePlayerWarning config
     // if this player already exists, ask if that's correct
+    let replaced = false;
     if (config.duplicatePlayerWarning) {
         let pID = getHeaders().indexOf("player") - 1; // -1 as we remove place
+        if (pID < 0) pID = getHeaders().indexOf("participant") - 1;
+        if (pID < 0) pID = getHeaders().indexOf("team") - 1;
+        if (pID < 0) pID = getHeaders().indexOf("squad") - 1;
+        if (pID < 0) pID = getHeaders().indexOf("group") - 1;
 
         for (let pl of saveData.records[userData.selected]) {
             //console.log(input[pID], pl[pID]);
-            if (input[pID] == pl[pID]) {
+            if (input[pID] == pl[pID] && input[pID] != undefined) {
                 let answer = confirm("This player already exists (" + input[pID] + ", " + pl[pID] + ")\nDo you wish to create another anyway?");
                 if (answer === false) {
                     answer = confirm("Replace? (If not, abort)");
                     if (answer === false) return; // abort
                     else {
-                        // replace old entry (remove old first)
-                        saveData.records[userData.selected].splice(pl, 1);
+                        // replace old entry (dont delete then add, if there's no sorting it would mess things up)
+                        let ind = saveData.records[userData.selected].indexOf(pl);
+                        saveData.records[userData.selected][ind] = input;
+                        replaced = true;
                     }
                 }
                 break;
@@ -651,7 +764,7 @@ function addTableRow() {
         }
     }
 
-    saveData.records[userData.selected].push(input);
+    if (replaced == false) saveData.records[userData.selected].push(input);
     sortTable();
     renderEverything();
 }
@@ -833,9 +946,16 @@ function toggleFavoritePlayer() {
     renderRightSideProfile();
 }
 
+function searchToggleNormal() {
+    setSetting("searchOnlyFavorites", false);
+
+    renderCategoriesList();
+}
+
 function searchToggleFavorites() {
-    if (getSetting("searchOnlyFavorites", true) == false) setSetting("searchOnlyFavorites", true);
-    else setSetting("searchOnlyFavorites", false);
+    //if (getSetting("searchOnlyFavorites", true) == false) setSetting("searchOnlyFavorites", true);
+    //else setSetting("searchOnlyFavorites", false);
+    setSetting("searchOnlyFavorites", true);
 
     renderCategoriesList();
 }

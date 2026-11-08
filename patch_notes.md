@@ -158,3 +158,45 @@
 - This area is now aligned to the left
 - Only show top 10 is now enabled by default
 - Convert to Wikitext now also copies into clipboard and shows a message, including the amount of characters
+
+
+
+## v1.5 ()
+-> Link Icons:
+- Links to the most common websites for evidence are now rendered with an icon of the respective service
+- This makes it easy to see where a link will lead you (PC browsers show it in the bottom right, mobile didn't)
+- They are detected based on the URL so new/niche ways to link to them may not be included (yet)
+- Supported: Discord images, Discord message links, YouTube, YouTube Shorts, Imgur, Cloud Mail Ru
+
+-> Favorites & Player Profiles:
+- Left side: Removed button to toggle between categories and favorite categories
+- Replaced it with 3 buttons to open categories, favorite categories, favorite players (respectively)
+- Removed "Show favorite players" setting
+- If the player is in the top 10 of a Record Points category, it is now shown at the top (below ban status)
+
+-> Number formatting:
+- Added formatNumber function
+- calcColumn now automatically formats numbers
+- Supported notation ends at D, but added ? to display higher values
+
+-> Editor Mode:
+- "Delete all instances of player" now has a confirmation dialog, which shows in how many (and which) categories the player appears
+- Edit category and Calc areas now have a black background
+- New setting: Toggle catConfigs area
+- The setting is also available next to the other Edit category buttons for quick access
+
+-> Editor Mode (Rows):
+- If a column is non-existant for a row, it will now be available in "Edit row", taken from the header
+- This makes it possible to fill up gaps if desired, or work with a new column added through a header change
+- Added X button to erase the cell's content (or delete it if it's in last place)
+
+-> Duplicate player warning:
+- No longer gives a warning when no player column could be found (regardless of it being a duplicate or not)
+- More terms than "player" are now considered: participant, team, squad, group
+- Replacing will now directly replace the row, instead of removing and then re-adding (could cause niche issues when there is no sorting defined)
+
+-> Other:
+- Clicking a player (to see their profile) now only triggers with the name cell, not all of them
+- Perfected centering of title at the top
+- Changed link to other projects in the bottom right
+- Fixed "Only show top 10?" not being enabled by default sometimes
