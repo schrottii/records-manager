@@ -1,4 +1,4 @@
-## v1.0 ()
+## v1.0 (2026-01-11)
 - Release
 
 
@@ -158,3 +158,67 @@
 - This area is now aligned to the left
 - Only show top 10 is now enabled by default
 - Convert to Wikitext now also copies into clipboard and shows a message, including the amount of characters
+
+
+
+## v1.5 (2026-11-10)
+-> News:
+- Major new feature, summarizing the changes of a Records update
+- Gives a much better overview than a self-written list, looking through recent submissions, or Wiki article edit history
+- Accessed via a button in the top left, appears on the right side
+
+-> News types:
+- For each action that can be done while editing records, a different news type gets recorded
+- Edit Cell: changing the sorter value in a row (such as amount, time) - shows the value+place before/after, considers ties
+- Delete Player: deleting all instances of a player - shows name + how many categories + which
+- Move Category: when moving a category below a different one - shows name + category above it before/after
+- Edit Cat Config: when changing any of the catConfigs for a category - shows name + value before/after
+- Create Category: when creating a new category - shows name
+- Create Ban list: when creating a ban list - shows name
+- Add Player to Ban list: when adding a player to a ban list or importing it from wiki - shows list name + player name
+- Remove Player from Ban list: when removing a player from a ban list - shows list name + player name
+- Record Points: when a RP category is updated - shows how it changed from before to now, so top 10 players+positions+amount before/after
+
+-> Link Icons:
+- Links to the most common websites for evidence are now rendered with an icon of the respective service
+- This makes it easy to see where a link will lead you (PC browsers show URLs in the bottom left, mobile browsers do not)
+- They are detected based on the URL so new/niche ways to link to them may not be included (yet)
+- Supported: Discord images, Discord message links, YouTube, YouTube Shorts, Imgur, Cloud Mail Ru
+
+-> Favorites & Player Profiles:
+- Left side: Removed button to toggle between categories and favorite categories
+- Replaced it with 4 buttons to open categories (default), favorite categories, favorite players, news (respectively)
+- Removed "Show favorite players" setting
+- Profile: If the player is in the top 10 of a Record Points category, it is now shown at the top (below ban status)
+
+-> Number formatting:
+- Added formatNumber function, uses normal notation but may be expanded in the future
+- calcColumn now automatically formats numbers
+- Supported notation still ends at D, but added ? for higher values
+
+-> Editor Mode:
+- "Delete all instances of player" now has a confirmation dialog, which shows in how many (and which) categories the player appears, and avoids accidental deletion
+- Edit category and Calc areas now have a black background
+- New setting: Toggle catConfigs area
+- The setting is also available next to the other Edit category buttons for quick access
+
+-> Editor Mode (Rows):
+- If a column is non-existant for a row, it will now be available in "Edit row", taken from the header
+- This makes it possible to fill up gaps if desired, or work with a new column added through a header change
+- Added X button to erase a cell's content (or delete it if it's in last place)
+
+-> Editor Mode (News):
+- News are automatically created and stored when editing, basically they track changes relevant for users
+- Using the X buttons, singular news can be deleted (useful to remove mistakes, things that should stay hidden)
+- Use the "Clear news" button when starting a new records update, to delete all the previous news (which are not new anymore)
+
+-> Duplicate player warning:
+- No longer gives an odd warning when no player column could be found (regardless of it being a duplicate or not)
+- More terms than "player" and "user" are now considered: participant, team, squad, group
+- Choosing the replace option will now directly replace the row, instead of removing and then re-adding (could cause niche issues when there is no sorter defined)
+
+-> Other:
+- Clicking a player (to see their profile) now only triggers with the name cell, not all of them
+- Perfected centering of title at the top
+- Changed link to other projects in the bottom right
+- Fixed "Only show top 10?" not being enabled by default sometimes

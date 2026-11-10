@@ -24,7 +24,7 @@
 <body>
     <div class="topRow">
         <img style="float: left; height: 64px;" src="images/logo.png" />
-        <div style="float: right;">
+        <div class="themeSelector">
             <button class="themeButton" onclick="changeTheme('light')">☀️</button>
             <button class="themeButton" onclick="changeTheme('dark')">🌙</button>
             <button class="themeButton" onclick="changeTheme('auto')">⚡</button>
@@ -36,7 +36,11 @@
     <div style="background-color: rgb(20, 20, 20, 0.5);">
         <!-- left side -->
         <div class="leftSide">
-            <button onclick="searchToggleFavorites();" style="float: left;">⭐</button> search: <br />
+            <button onclick="searchToggleNormal();" style="float: left;">📃</button>
+            <button onclick="searchToggleFavorites();" style="float: left;">⭐📃</button>
+            <button onclick="showFavoritePlayers();" style="float: left;">⭐👤</button>
+            <button onclick="showNews();" style="float: left;">News</button>
+            search: <br />
             <input id="categoriesSearch" type="search" onkeyup="renderCategoriesList();" style="width: 98%;">
 
             <div class="leftSideList">
@@ -50,11 +54,11 @@
         <!-- right side -->
         <div class="rightSide">
             <h3 id="sectionTitle">---</h3>
-            <span id="editorAreaCategory"></span>
+            <div id="editorAreaCategory" class="editorArea"></div>
             <br />
             <span id="rightSide"></span>
             <span id="editorAreaRow"></span>
-            <span id="editorAreaCalc"></span>
+            <div id="editorAreaCalc" class="editorArea"></div>
         </div>
         <hr style="clear:both" />
     </div>
@@ -62,7 +66,7 @@
     <div class="settingsArea">
         <h3>Settings and tools</h3>
         highlight row: <input id="tableSearch" type="search" onblur="renderRightSide();">
-        <br /> <input id="top10" value="true" type="checkbox" onchange="renderRightSide();">Only show top 10?
+        <br /> <input id="top10" checked type="checkbox" onchange="renderRightSide();">Only show top 10?
         <br /> <input id="toggleUpsideDown" type="checkbox" onchange="toggleUpsideDown();">Upside Down?
         <br /> <input id="toggleGaps" type="checkbox" onchange="toggleGaps();">Show gaps?
         <br /> <input id="toggleShowProfiles" type="checkbox" onchange="toggleShowProfiles();">Click player to see profile?
@@ -70,7 +74,7 @@
         see player profile: <input id="playerSearch" type="search" onblur="openPlayer();">
         <br />
         <button onclick="showRandomCategory()">Random category</button>
-        <button onclick="showFavoritePlayers()">Show favorite players</button>
+        <!-- <button onclick="showFavoritePlayers()">Show favorite players</button> -->
 
         <div id="editorOnlySettings">
             <h3>(Editor mode only)</h3>
@@ -78,6 +82,7 @@
             <button onclick="importSaveData()">Import data</button>
             <button onclick="convertToWikitext()">Convert to Wikitext</button>
             <button onclick="createNewCategory()">Create new category</button>
+            <button onclick="toggleCatConfigsArea()">Toggle catConfigs area</button>
         </div>
     </div>
 
@@ -91,7 +96,7 @@
     <hr />
     <div style="float: right; text-align: right;">
         <span id="tabTitle3"></span> using <br />
-        Records Manager v1.4 <br />
+        Records Manager v1.5 <br />
         Made by Schrottii/Balnoom &copy; 2025-2026 <br />
         <a href="LICENSE.md" target="_blank"><b>LICENSE</b></a> -
         <a href="TOS.md" target="_blank">TOS</a> -
@@ -99,10 +104,10 @@
         <br />
         <br />
 
-        <a href="https://schrottii.github.io/" target="_blank">link to my other projects</a><br />
+        <a href="https://schrottii.github.io/" target="_blank">Link to other Balnoom projects</a><br />
         <br />
 
-        <a href="https://schrottii.github.io/" target="_blank">link to my other projects</a><br />
+        <br />
         <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
         <script type='text/javascript'>kofiwidget2.init('Support me on Ko-fi', '#f57373', 'Y8Y2XMZX1'); kofiwidget2.draw();</script>
 
@@ -115,6 +120,7 @@
     <script src="code/recordpoints.js"></script>
     <script src="code/banlists.js"></script>
     <script src="code/profiles.js"></script>
+    <script src="code/news.js"></script>
 
     <script src="code/save.js"></script>
     <script src="code/main.js"></script>

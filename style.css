@@ -81,16 +81,63 @@ hr {
 }
 
 .tabTitle {
-    position: absolute;
     display: inline;
     margin: auto;
     text-align: center;
+    margin-left: -64px;
+}
+
+.themeSelector {
+    float: right;
+    position: absolute;
+    right: 2%;
 }
 
 @media only screen and (max-width: 768px) {
     .tabTitle {
         position: unset;
         display: block;
+        margin-left: 0px;
+    }
+
+    .themeSelector {
+        float: right;
+        position: unset;
+        right: unset;
+    }
+}
+
+.settingsArea {
+    text-align: left;
+    margin-left: 30%;
+    width: 40%;
+}
+
+    /*
+    .settingsArea button {
+        text-align: center;
+        margin: 0 auto;
+        display: block;
+    }
+*/
+
+    .settingsArea h3 {
+        text-align: center;
+    }
+
+.favoriteButton {
+    position: absolute;
+    left: 31%;
+}
+
+@media only screen and (max-width: 768px) {
+    .settingsArea {
+        margin-left: 5%;
+        width: 90%;
+    }
+
+    .favoriteButton {
+        left: 2%;
     }
 }
 
@@ -172,6 +219,18 @@ hr {
 
 .listButton:hover {
     filter: brightness(50%);
+}
+
+.linkIcon {
+    pointer-events: none;
+    width: 1em;
+    height: 1em;
+    position: relative;
+    bottom: -0.25em;
+}
+
+.editorArea {
+    background-color: black;
 }
 
 

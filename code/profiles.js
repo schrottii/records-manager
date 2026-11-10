@@ -6,6 +6,8 @@
 
     ui.rightSide.innerHTML = "<button class='favoriteButton' onclick='renderRightSide();'>Back</button>"//<br style='clear: both;' />"
         + renderPlayerBanStatus(player)
+        + renderPlayerRecordPointsStatus(player)
+        + "<hr />"
         + renderPlayerPoints(player);
 
     ui.editorAreaCategory.innerHTML = "";
@@ -102,7 +104,37 @@ function renderPlayerBanStatus(player) {
         ren += "</ul>";
     }
 
-    ren += "<hr />";
+    return ren;
+}
+
+function renderPlayerRecordPointsStatus(player) {
+    let ren = "";
+    let recordPointCategories = [];
+    let cat;
+
+    // go through all categories and see if they are based on record points
+    for (let c in saveData.catConfig) {
+        cat = saveData.catConfig[c];
+        if (cat.isRecordPoints === "true" || cat.isRecordPoints === "total") {
+            //console.log(cat, cat.isRecordPoints, c);
+            recordPointCategories.push(c);
+        }
+    }
+    //console.log(recordPointCategories);
+
+    // get the player's points in all categories
+    let points = getRecordPoints(false, player, true);
+    let places = {};
+    //console.log(places);
+
+    // filter to only the RP-based categories and render
+    for (let p in points) {
+        if (!recordPointCategories.includes(p)) continue;
+        places[p] = 11 - points[p]; // 10th place = 1 point ~ 1st place = 10 points
+        ren += "<br /><span style='color: " + (points[p] == 10 ? "gold" : points[p] >= 8 ? "silver" : "unset") + ";'>"
+            + saveData.catConfig[p].name + ": " + places[p] + ". place</span>";
+    }
+
     return ren;
 }
 

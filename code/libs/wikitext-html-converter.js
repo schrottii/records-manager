@@ -72,12 +72,35 @@ function tableFromWiki(wikiTable, separator) {
             for (let row of rows) {
                 if (row.includes("[http")) {
                     row = imagesFromWiki(row, "a"); // edited
+                } // LINES BELOW EDITED
+
+                if (onclick !== "" || myclass !== "") {
+                    let onclick = "";
+                    let myclass = "";
+                    let realrowcontent = row;
+
+                    if (line.includes("onclick=")) {
+                        onclick += line.split("onclick=")[1].split(" ")[0];
+                        //realrowcontent = row.split("onclick=")[1].split(" ")[1];
+                        //console.log("[1] / ", onclick, " // ", myclass, " // ", realrowcontent, " // ", row);
+                    }
+                    if (line.includes("class=")) {
+                        myclass += line.split("class=")[1].split(" ")[0];
+                        //realrowcontent = row.split("class=")[1].split(" ")[1];
+                    }
+                    if (row.includes("onclick=")) {
+                        if (onclick !== "") onclick = onclick.substr(0, onclick.length - 1) + "; " + row.split("onclick=")[1].split(" ")[0].substr(1); // remove ' at end and ' at start
+                        else onclick += row.split("onclick=")[1].split(" ")[0];
+                        if (realrowcontent.includes("onclick=")) realrowcontent = realrowcontent.split("onclick=")[1].substr(realrowcontent.split("onclick=")[1].indexOf(" "));
+                    }
+                    if (row.includes("class=")) {
+                        if (myclass !== "") myclass = myclass.substr(0, myclass.length - 1) + "; " + row.split("class=")[1].split(" ")[0].substr(1); // remove ' at end and ' at start
+                        else myclass += row.split("class=")[1].split(" ")[0];
+                        if (realrowcontent.includes("class=")) realrowcontent = realrowcontent.split("class=")[1].substr(realrowcontent.split("class=")[1].indexOf(" "));
+                    }
+
+                    output = output + "<td onclick=" + onclick + " class=" + myclass + ">" + realrowcontent + "</td>";
                 }
-                if (line.includes("onclick=") && line.includes("class=")) {
-                    output = output + "<td onclick=" + line.split("onclick=")[1].split(" ")[0] + " class=" + line.split("class=")[1].split(" ")[0] + ">" + (row.includes("onclick=") ? row.split("onclick=")[1].split(" ")[1] : row) + "</td>";
-                }
-                else if (line.includes("onclick=")) output = output + "<td onclick=" + line.split("onclick=")[1].split(" ")[0] + ">" + (row.includes("onclick=") ? row.split("onclick=")[1].split(" ")[1] : row) + "</td>";
-                else if (line.includes("class=")) output = output + "<td class=" + line.split("class=")[1].split(" ")[0] + ">" + (row.includes("class=") ? row.split("class=")[1].split(" ")[1] : row) + "</td>";
                 else output = output + "<td>" + row + "</td>";
             }
             continue;
