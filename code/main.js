@@ -692,6 +692,9 @@ function editCategory(category = userData.selected) {
     // calc
     ui.editorAreaCalc.innerHTML = "Calc: <input style='width: 40%;' onkeyup='editorCalc();' id='CALCFIELD'> : <span id='CALCRESULT'>";
 
+    // calc
+    ui.editorAreaCalc.innerHTML = "Calc: <input style='width: 40%;' onkeyup='editorCalc();' id='CALCFIELD'> : <span id='CALCRESULT'>";
+
     ui.editorAreaCategory.innerHTML = render;
 }
 
@@ -998,6 +1001,40 @@ function searchToggleFavorites() {
     //if (getSetting("searchOnlyFavorites", true) == false) setSetting("searchOnlyFavorites", true);
     //else setSetting("searchOnlyFavorites", false);
     setSetting("searchOnlyFavorites", true);
+
+    renderCategoriesList();
+}
+
+function toggleFavorite() {
+    if (userData.favorites.includes(userData.selected)) {
+        // remove category from favorites
+        userData.favorites.splice(userData.favorites.indexOf(userData.selected), 1);
+    }
+    else {
+        // add to favorites
+        userData.favorites.push(userData.selected);
+    }
+
+    renderEverything();
+}
+
+function toggleFavoritePlayer() {
+    if (userData.favoriteplayers.includes(currentPlayer)) {
+        // remove category from favorites
+        userData.favoriteplayers.splice(userData.favoriteplayers.indexOf(currentPlayer), 1);
+    }
+    else {
+        // add to favorites
+        userData.favoriteplayers.push(currentPlayer);
+    }
+
+    showFavoritePlayers();
+    renderRightSideProfile();
+}
+
+function searchToggleFavorites() {
+    if (getSetting("searchOnlyFavorites", true) == false) setSetting("searchOnlyFavorites", true);
+    else setSetting("searchOnlyFavorites", false);
 
     renderCategoriesList();
 }
