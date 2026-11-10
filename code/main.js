@@ -53,9 +53,21 @@ var linkIcons = [
     ["https://cloud.mail.ru", "images/linkicons/cloudmailru.png"],
 ];
 
+var normalNotation = "kMBTQqSsOND?".split("");
+
 ////////////////////////////////////////////////
 // core functions
 ////////////////////////////////////////////////
+
+function formatNumber(num) {
+    // why do I always re-write new fn and formatNumber functions instead of ever re-using one :joy:
+    num = "" + num;
+    if (num == "undefined") return "";
+    if (num.length < 4) return num;
+    if (num.includes("e+")) num = num.split("e+")[0] + "0".repeat(num.split("e+")[1] - (num.split("e+")[0].length - 1))
+    let pos = Math.floor((num.length - 4) / 3);
+    return num.substr(0, Math.max(1, (num.length - 4) % 3 + 1)) + "." + num.substr((num.length - 4) % 3 + 1, 2) + normalNotation[Math.min(pos, normalNotation.length - 1)];
+}
 
 function generateID() {
     return "" + Math.random().toString(16).slice(2);
@@ -192,18 +204,6 @@ function sortableValue(v) {
     return parseInt(v);
 }
 
-var normalNotation = "kMBTQqSsOND?".split("");
-
-function formatNumber(num) {
-    // why do I always re-write new fn and formatNumber functions instead of ever re-using one :joy:
-    num = "" + num;
-    if (num == "undefined") return "";
-    if (num.length < 4) return num;
-    if (num.includes("e+")) num = num.split("e+")[0] + "0".repeat(num.split("e+")[1] - (num.split("e+")[0].length - 1))
-    let pos = Math.floor((num.length - 4) / 3);
-    return num.substr(0, Math.max(1, (num.length - 4) % 3 + 1)) + "." + num.substr((num.length - 4) % 3 + 1, 2) + normalNotation[Math.min(pos, normalNotation.length - 1)];
-}
-
 function toggleUpsideDown() {
     setSetting("upsideDown", ui.toggleUpsideDown.checked);
     sortTable();
@@ -332,8 +332,8 @@ function loadCategoriesFromWiki(categoriesContent) {
     }
 }
 
-function getHeaders(name = userData.selected) {
-    let trimmedHeaders = saveData.catConfig[name].header.split("!!");
+function getHeaders(category = userData.selected) {
+    let trimmedHeaders = saveData.catConfig[category].header.split("!!");
     for (let h in trimmedHeaders) {
         trimmedHeaders[h] = trimmedHeaders[h].trim().toLowerCase();
     }
@@ -342,8 +342,11 @@ function getHeaders(name = userData.selected) {
 
 function createTable(name, og_content) {
     // record points format tables
-    if (saveData.catConfig[name].isRecordPoints === "true") saveData.records[name] = og_content = sortTable(generateRecordPointsTable(getRecordPoints()), "manual");
-    if (saveData.catConfig[name].isRecordPoints === "total") saveData.records[name] = og_content = sortTable(generateRecordPointsTable(getRecordPoints(true)), "manual");
+    if (saveData.catConfig[name].isRecordPoints === "true" || saveData.catConfig[name].isRecordPoints === "total") {
+        let before = JSON.stringify(saveData.records[name]);
+        saveData.records[name] = og_content = sortTable(generateRecordPointsTable(getRecordPoints(saveData.catConfig[name].isRecordPoints === "total" ? true : false)), "manual");
+        recordPointsNews(before, name);
+    }
 
     // turns data into a table, for rendering
     let content = [];
@@ -567,11 +570,17 @@ function deleteRow(selTable = userData.selected, selRow = editor.row) {
     // deletes selected row
     if (!config.editorMode) return false;
 
+    let playerName = saveData.records[selTable][selRow - 1][findPlayerColumn(selTable)];
+
     let newTable = [];
     for (let t in saveData.records[selTable]) {
         if (t != selRow - 1) {
             newTable.push(saveData.records[selTable][t]);
         }
+    }
+
+    if (playerName != -1 && playerName != null && playerName != undefined) {
+        NewsTypes.DeletePlayer(playerName, 1, saveData.catConfig[selTable].name); // normally only transfer ID but here name because it's normally a list of all category names, here just 1 name
     }
 
     saveData.records[selTable] = newTable;
@@ -584,7 +593,14 @@ function deleteRow(selTable = userData.selected, selRow = editor.row) {
 function editCell(nr) {
     if (!config.editorMode) return false;
 
-    saveData.records[userData.selected][editor.row - 1][nr] = document.getElementById("cell-" + nr).value;
+    let previousValue = saveData.records[userData.selected][editor.row - 1][nr];
+    let newValue = document.getElementById("cell-" + nr).value;
+
+    // if it has changed ...
+    if (previousValue != newValue) {
+        saveData.records[userData.selected][editor.row - 1][nr] = newValue; // doesn't need to be in here but optimization
+        if (nr == findSorterColumn()) NewsTypes.EditCell(userData.selected, findCurrentPlayer(), editor.row - 1, nr, previousValue, newValue);
+    }
 
     sortTable();
     renderRightSide();
@@ -594,6 +610,9 @@ function deleteCell(nr) {
     if (!config.editorMode) return false;
 
     //saveData.records[userData.selected][editor.row - 1].splice(nr, 1);
+    let previousValue = saveData.records[userData.selected][editor.row - 1][nr];
+    if (nr == findSorterColumn()) NewsTypes.EditCell(userData.selected, findCurrentPlayer(), editor.row - 1, nr, previousValue, "");
+
     // delete if last, clear if not (likely more wanted in most cases)
     if (nr == saveData.records[userData.selected][editor.row - 1].length - 1) {
         saveData.records[userData.selected][editor.row - 1].pop();
@@ -631,6 +650,8 @@ function deletePlayer(player) {
             if (table[row].includes(player)) deleteRow(t, parseInt(row) + 1);
         }
     }
+
+    NewsTypes.DeletePlayer(player, categoryNames.length, categoryNames.toString());
 
     // render list, right side is done by deleteRow
     editor.row = -1;
@@ -701,7 +722,10 @@ function editCategoryConfig(cfg) {
     newValue = newValue.value;
     if (newValue == "") return false;
 
+    let previousValue = saveData.catConfig[editor.category][cfg];
     saveData.catConfig[editor.category][cfg] = newValue;
+
+    NewsTypes.EditCatConfig(editor.category, cfg, previousValue, newValue);
 
     if (cfg == "sorter") sortTable();
     renderRightSide();
@@ -803,24 +827,40 @@ function moveTable() {
     let movingTable = Object.assign([], saveData.records[movingID]);
 
     let newRecords = {};
+
+    let previousTable = "";
+    let previousTopName = "";
+
     //console.log(ID, movingID, Object.keys(newRecords).indexOf(ID), Object.keys(newRecords).indexOf(movingID));
     //console.log(saveData.records, saveData.records.length, newRecords, newRecords.length);
+
+    // go through all categories
     for (let table in saveData.records) {
         //console.log(table, ID, Object.keys(newRecords).length);
+
+        // either we have arrived at the target location, or it's the first one
         if (table == ID || (ID === "0" && Object.keys(newRecords).length == 0)) {
             if (ID !== "0") newRecords[ID] = Object.assign([], saveData.records[table]);
             newRecords[movingID] = movingTable;
+
             console.log(newRecords);
             //console.log(newRecords[ID], newRecords[movingID]);
         }
-        if (table == movingID) continue;
-
+        // this is where we want to move away from, skip...
+        if (table == movingID) {
+            previousTopName = previousTable;
+            continue;
+        }
+        // push normally
         if (table != undefined && table != "undefined") newRecords[table] = Object.assign([], saveData.records[table]);
+        previousTable = table;
     }
 
     // save
     saveData.records = {};
     saveData.records = newRecords;
+
+    NewsTypes.MoveCategory(movingID, previousTopName, ID);
 
     // render
     editor.category = userData.selected = movingID;
@@ -916,6 +956,8 @@ function createNewCategory(name = undefined) {
     let newID = generateID();
     saveData.records[newID] = [];
     saveData.catConfig[newID] = { name: name, header: "! Place !! x !! y" };
+
+    NewsTypes.CreateCategory(newID);
     renderCategoriesList();
 }
 

@@ -3,8 +3,6 @@ var selectedBanList = 0;
 function renderBanLists() {
     ui.banListsArea.style.display = "";
 
-
-
     let ren = "";
     for (let but in saveData.banLists) {
         ren += "<button style='" + (but == selectedBanList ? "background-color: red;" : "") + "' onclick=selectBanList(" + but + ")>" + saveData.banLists[but][0] + "</button>";
@@ -12,8 +10,6 @@ function renderBanLists() {
 
     if (config.editorMode) ren += "<button onclick=newBanList()>Create new</button>";
     ui.banListsButtons.innerHTML = ren;
-
-
 
     renderBanListContent();
 }
@@ -47,6 +43,8 @@ function newBanList() {
 
     saveData.banLists.push([name, []]);
     selectedBanList = saveData.banLists.length - 1;
+
+    NewsTypes.BanlistCreate(name);
     renderBanLists();
 }
 
@@ -56,6 +54,8 @@ function banListPlayerAdd() {
 
     // unshift because newest at the top
     saveData.banLists[selectedBanList][1].unshift(name);
+
+    NewsTypes.BanlistAddPlayer(saveData.banLists[selectedBanList][0], name);
     renderBanListContent();
     return true;
 }
@@ -67,6 +67,8 @@ function banListPlayerRemove() {
     let index = saveData.banLists[selectedBanList][1].indexOf(name);
     if (index == -1) return false;
     saveData.banLists[selectedBanList][1].splice(index, 1);
+
+    NewsTypes.BanlistRemovePlayer(saveData.banLists[selectedBanList][0], name);
     renderBanListContent();
     return true;
 }
@@ -86,6 +88,8 @@ function banListPlayerLoadFromWiki() {
     }
 
     saveData.banLists[selectedBanList][1] = data;
+
+    NewsTypes.BanlistAddPlayer(saveData.banLists[selectedBanList][0], data.toString());
     renderBanListContent();
     return true;
 }
